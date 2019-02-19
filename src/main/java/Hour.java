@@ -1,18 +1,22 @@
 import java.util.Scanner;
 
-public class Hour {
-    String phraseForHours(String hours) {
-        while (!hours.matches("[0-9]|[0-5]?[0-9]|\\*")) {
-            System.out.println("Введиете корректное колличество часов(0-59): ");
-            Scanner scanner = new Scanner(System.in);
-            hours = scanner.nextLine();
+public class Hour extends Phrase {
+
+    public Hour(String[] userInput) {
+        super(userInput);
+        this.phrase = userInput[1];
+    }
+
+    void getPhrase(Scanner scanner) {
+        while (!phrase.matches("[0-9]|[0-5]?[0-9]|\\*")) {
+            System.out.println("\nВведиете корректное колличество часов(0-59): ");
+            phrase = scanner.nextLine();
         }
 
-        if (hours.equals("*")) {
-            return "каждый час,";
+        if (phrase.equals("*")) {
+            System.out.print("каждый час,");
         } else {
-            return "в " + hours + " час(ов),";
+            System.out.print("в " + phrase + " час(ов),");
         }
-
     }
 }

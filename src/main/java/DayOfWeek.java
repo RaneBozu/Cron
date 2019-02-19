@@ -1,33 +1,43 @@
 import java.util.Scanner;
 
-public class DayOfWeek {
-    String phraseForDayOfTheWeek(String dayOfTheWeek) {
-        while (!dayOfTheWeek.matches("[1-7]|\\*")) {
-            System.out.println("Введиете корректный день недели(1-7): ");
-            Scanner scanner = new Scanner(System.in);
-            dayOfTheWeek = scanner.nextLine();
+public class DayOfWeek extends Phrase {
+    public DayOfWeek(String[] userInput) {
+        super(userInput);
+        this.phrase = userInput[4];
+    }
+
+    void getPhrase(Scanner scanner) {
+
+        while (!phrase.matches("[1-7]|\\*")) {
+            System.out.println("\nВведиете корректный день недели(1-7): ");
+            phrase = scanner.nextLine();
         }
 
-        if (dayOfTheWeek.equals("*")) {
-            return "каждый день недели,";
+        if (phrase.equals("*")) {
+            System.out.print("каждый день недели,");
         }
-        switch (dayOfTheWeek) {
+        switch (phrase) {
             case "1":
-                return "каждый Понедельник,";
+                System.out.print("каждый Понедельник,");
+                break;
             case "2":
-                return "каждый Вторник,";
+                System.out.print("каждый Вторник,");
+                break;
             case "3":
-                return "каждыю Среду,";
+                System.out.print("каждыю Среду,");
+                break;
             case "4":
-                return "каждый Четверг,";
+                System.out.print("каждый Четверг,");
+                break;
             case "5":
-                return "каждую Пятницу,";
+                System.out.print("каждую Пятницу,");
+                break;
             case "6":
-                return "каждую Субботу,";
+                System.out.print("каждую Субботу,");
+                break;
             case "7":
-                return "каждое Воскресенье,";
-            default:
-                return "день недели,";
+                System.out.print("каждое Воскресенье,");
+                break;
         }
     }
 }

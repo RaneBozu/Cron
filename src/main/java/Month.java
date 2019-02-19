@@ -1,43 +1,60 @@
 import java.util.Scanner;
 
-public class Month {
-    String phraseForMonths(String month) {
-        while (!month.matches("[1-9]|12|11|10|\\*")) {
-            System.out.println("Введиете корректный месяц(1-12): ");
-            Scanner scanner = new Scanner(System.in);
-            month = scanner.nextLine();
+public class Month extends Phrase {
+    public Month(String[] userInput) {
+        super(userInput);
+        this.phrase = userInput[3];
+    }
+
+    void getPhrase(Scanner scanner) {
+
+        while (!phrase.matches("[1-9]|12|11|10|\\*")) {
+            System.out.println("\nВведиете корректный месяц(1-12): ");
+            phrase = scanner.nextLine();
         }
 
-        if (month.equals("*")) {
-            return "каждый месяц,";
+        if (phrase.equals("*")) {
+            System.out.print("каждый месяц,");
         }
-        switch (month) {
+        switch (phrase) {
             case "1":
-                return "в январе,";
+                System.out.print("в январе,");
+                break;
             case "2":
-                return "в феврале,";
+                System.out.print("в феврале,");
+                break;
             case "3":
-                return "в марте,";
+                System.out.print("в марте,");
+                break;
             case "4":
-                return "в апреле,";
+                System.out.print("в апреле,");
+                break;
             case "5":
-                return "в мае,";
+                System.out.print("в мае,");
+                break;
             case "6":
-                return "в июне,";
+                System.out.print("в июне,");
+                break;
             case "7":
-                return "в июле,";
+                System.out.print("в июле,");
+                break;
             case "8":
-                return "в августе,";
+                System.out.print("в августе,");
+                break;
             case "9":
-                return "в сентябре,";
+                System.out.print("в сентябре,");
+                break;
             case "10":
-                return "в октябре,";
+                System.out.print("в октябре,");
+                break;
             case "11":
-                return "в ноябре,";
+                System.out.print("в ноябре,");
+                break;
             case "12":
-                return "в декабре,";
-            default:
-                return "месяц,";
+                System.out.print("в декабре,");
+                break;
         }
     }
 }
+
+

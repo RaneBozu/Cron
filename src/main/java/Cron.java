@@ -2,11 +2,6 @@ import java.util.Scanner;
 
 public class Cron {
     public static void main(String[] args) {
-        Minute minute = new Minute();
-        Hour hour = new Hour();
-        DayOfMonth dayOfMonth = new DayOfMonth();
-        DayOfWeek dayOfWeek = new DayOfWeek();
-        Month month = new Month();
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Введите запрос: 5 параметров разделенные пробелом.(минуты, часы, день месяца, месяц, день недели)");
@@ -16,12 +11,12 @@ public class Cron {
             userInput = scanner.nextLine().split(" ");
         }
 
-        String[] fullPhrase = {minute.phraseForMinutes(userInput[0]), hour.phraseForHours(userInput[1]),
-                dayOfMonth.phraseForDayOfMonth(userInput[2]), month.phraseForMonths(userInput[3]),
-                dayOfWeek.phraseForDayOfTheWeek(userInput[4])};
+        Phrase[] fullPhrase = {new DayOfWeek(userInput),  new Month(userInput),
+                new DayOfMonth(userInput), new Hour(userInput), new Minute(userInput)};
+
         System.out.println("Запускать задание: ");
-        for (int i = userInput.length - 1; i >= 0; i--) {
-            System.out.print(fullPhrase[i] + " ");
+        for (Phrase phrase : fullPhrase) {
+            phrase.getPhrase(scanner);
         }
     }
 }
