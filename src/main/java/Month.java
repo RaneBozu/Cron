@@ -1,57 +1,58 @@
-import java.util.Scanner;
+import javax.swing.*;
+import java.util.List;
 
 public class Month extends Phrase {
+
     public Month(String[] userInput) {
         super(userInput);
         this.phrase = userInput[3];
     }
 
-    void getPhrase(Scanner scanner) {
-
-        while (!phrase.matches("[1-9]|12|11|10|\\*")) {
-            System.out.println("\nВведиете корректный месяц(1-12): ");
-            phrase = scanner.nextLine();
-        }
+    void getPhrase(List<String> fullPhrase) {
+//        while (!phrase.matches("[1-9]|12|11|10|\\*")) {
+//            JOptionPane.showMessageDialog(null,"Введиете корректный месяц(1-12)",
+//                    "Warning", JOptionPane.WARNING_MESSAGE);
+//        }
 
         if (phrase.equals("*")) {
-            System.out.print("каждый месяц,");
+            fullPhrase.add("каждый месяц,");
         }
         switch (phrase) {
             case "1":
-                System.out.print("в январе,");
+                fullPhrase.add("в январе,");
                 break;
             case "2":
-                System.out.print("в феврале,");
+                fullPhrase.add("в феврале,");
                 break;
             case "3":
-                System.out.print("в марте,");
+                fullPhrase.add("в марте,");
                 break;
             case "4":
-                System.out.print("в апреле,");
+                fullPhrase.add("в апреле,");
                 break;
             case "5":
-                System.out.print("в мае,");
+                fullPhrase.add("в мае,");
                 break;
             case "6":
-                System.out.print("в июне,");
+                fullPhrase.add("в июне,");
                 break;
             case "7":
-                System.out.print("в июле,");
+                fullPhrase.add("в июле,");
                 break;
             case "8":
-                System.out.print("в августе,");
+                fullPhrase.add("в августе,");
                 break;
             case "9":
-                System.out.print("в сентябре,");
+                fullPhrase.add("в сентябре,");
                 break;
             case "10":
-                System.out.print("в октябре,");
+                fullPhrase.add("в октябре,");
                 break;
             case "11":
-                System.out.print("в ноябре,");
+                fullPhrase.add("в ноябре,");
                 break;
             case "12":
-                System.out.print("в декабре,");
+                fullPhrase.add("в декабре,");
                 break;
         }
     }
