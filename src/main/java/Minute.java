@@ -1,4 +1,5 @@
-import java.util.Scanner;
+import javax.swing.*;
+import java.util.List;
 
 public class Minute extends Phrase {
 
@@ -7,16 +8,16 @@ public class Minute extends Phrase {
         this.phrase = userInput[0];
     }
 
-    void getPhrase(Scanner scanner) {
-        while (!phrase.matches("[0-9]|[0-5]?[0-9]|\\*")){
-            System.out.println("\nВведиете корректное колличество минут(0-59): ");
-            phrase = scanner.nextLine();
-        }
+    void getPhrase(List<String> fullPhrase) {
+//        while (!phrase.matches("[0-9]|[0-5]?[0-9]|\\*")){
+//            JOptionPane.showMessageDialog(null,"Введиете корректное колличество минут(0-59)",
+//                    "Warning", JOptionPane.WARNING_MESSAGE);
+//        }
 
         if (phrase.equals("*")) {
-            System.out.print("каждую минуту.");
+            fullPhrase.add("каждую минуту.");
         } else {
-            System.out.print(phrase + " минут(у).");
+            fullPhrase.add(phrase + " минут(у).");
         }
     }
 }

@@ -1,4 +1,5 @@
-import java.util.Scanner;
+import javax.swing.*;
+import java.util.List;
 
 public class Hour extends Phrase {
 
@@ -7,16 +8,16 @@ public class Hour extends Phrase {
         this.phrase = userInput[1];
     }
 
-    void getPhrase(Scanner scanner) {
-        while (!phrase.matches("[0-9]|[0-5]?[0-9]|\\*")) {
-            System.out.println("\nВведиете корректное колличество часов(0-59): ");
-            phrase = scanner.nextLine();
-        }
+    void getPhrase(List<String> fullPhrase) {
+//        while (!phrase.matches("[0-9]|[0-5]?[0-9]|\\*")) {
+//            JOptionPane.showMessageDialog(null,"Введиете корректное колличество часов(0-59)",
+//                    "Warning", JOptionPane.WARNING_MESSAGE);
+//        }
 
         if (phrase.equals("*")) {
-            System.out.print("каждый час,");
+            fullPhrase.add("каждый час,");
         } else {
-            System.out.print("в " + phrase + " час(ов),");
+            fullPhrase.add("в " + phrase + " час(ов),");
         }
     }
 }

@@ -1,8 +1,8 @@
-import java.util.Scanner;
+import java.util.List;
 
 public class Phrase {
     String phrase;
     public Phrase(String[] userInput) {
     }
-    void getPhrase(Scanner scanner) {}
+    void getPhrase(List<String> fullPhrase) {}
 }

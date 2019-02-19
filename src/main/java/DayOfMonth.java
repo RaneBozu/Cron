@@ -1,4 +1,5 @@
-import java.util.Scanner;
+import javax.swing.*;
+import java.util.List;
 
 public class DayOfMonth extends Phrase {
 
@@ -7,17 +8,16 @@ public class DayOfMonth extends Phrase {
         this.phrase = userInput[2];
     }
 
-    void getPhrase(Scanner scanner) {
-
-        while (!phrase.matches("[0-2]?[0-9]|31|30|\\*") || phrase.equals("0")) {
-            System.out.println("\nВведиете корректный день месяца(1-31): ");
-            phrase = scanner.nextLine();
-        }
+    void getPhrase(List<String> fullPhrase) {
+//        while (!phrase.matches("[0-2]?[0-9]|31|30|\\*") || phrase.equals("0")) {
+//            JOptionPane.showMessageDialog(null,"Введиете корректный день месяца(1-31)",
+//                    "Warning", JOptionPane.WARNING_MESSAGE);
+//        }
 
         if (phrase.equals("*")) {
-            System.out.print("каждый день месяца,");
+            fullPhrase.add("каждый день месяца,");
         } else {
-            System.out.print(phrase + " числа,");
+            fullPhrase.add(phrase + " числа,");
         }
     }
 }
