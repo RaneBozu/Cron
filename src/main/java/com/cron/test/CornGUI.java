@@ -1,31 +1,36 @@
-package CornTranslator;
+package com.cron.test;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.List;
 
 class CornGUI extends JFrame {
     private JButton button = new JButton("Check");
-    private JTextArea leftArea = new JTextArea(20, 20);
-    private JTextArea rightArea = new JTextArea(20, 20);
+    private JTextArea leftArea = new JTextArea(2, 27);
+    private JTextArea rightArea = new JTextArea(2, 27);
     private JLabel infoLabel = new JLabel
             ("Введите запрос: параметры разделенные пробелом.(минуты, часы, день месяца, месяц, день недели, сезон)");
     private JLabel infoLabel1 = new JLabel("Выполнять задание");
+    private JPanel panel1 = new JPanel();
+    private JPanel panel2 = new JPanel();
 
     CornGUI() throws HeadlessException {
         super("Corn");
 
-        this.setBounds(200, 200, 800, 500);
+        this.setBounds(200, 200, 800, 300);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        panel1.setLayout(new BorderLayout());
         Container container = this.getContentPane();
-        container.setBackground(Color.gray);
+        container.setBackground(Color.LIGHT_GRAY);
+        panel1.setBackground(Color.LIGHT_GRAY);
+        panel2.setBackground(Color.LIGHT_GRAY);
         container.setLayout(new BorderLayout());
-        container.add(leftArea, BorderLayout.WEST);
-        container.add(rightArea, BorderLayout.EAST);
+        container.add(panel1, BorderLayout.WEST);
+        container.add(panel2, BorderLayout.EAST);
+        panel1.add(leftArea, BorderLayout.NORTH);
+        panel2.add(rightArea, BorderLayout.NORTH);
         container.add(infoLabel, BorderLayout.NORTH);
         container.add(infoLabel1, BorderLayout.CENTER);
         container.add(button, BorderLayout.SOUTH);
@@ -35,27 +40,29 @@ class CornGUI extends JFrame {
     class ButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            List<String > userInput;
+            String[] userInput;
             if(!leftArea.getText().isEmpty()){
-                userInput = Arrays.asList(leftArea.getText().split(" "));
+                userInput = leftArea.getText().split(" ");
             } else {
-                userInput = Arrays.asList(rightArea.getText().split(" "));
+                userInput = rightArea.getText().split(" ");
             }
 
-            if (!leftArea.getText().isEmpty() && !rightArea.getText().isEmpty() || userInput.size() > 6) {
+            if (!leftArea.getText().isEmpty() && !rightArea.getText().isEmpty() || userInput.length > 6) {
                 JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле, либо введено слишком много параметров",
                         "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            Phrase[] ph = {new Minute(), new Hour(), new DayOfMonth(), new Month(), new DayOfWeek(), new Season()};
-            StringBuilder massage = new StringBuilder("Каждый(ые) ");
-            for (int i = userInput.size() - 1; i >= 0; i--) {
-                if (ph[i].checkValue(userInput.get(i))) {
-                    JOptionPane.showMessageDialog(null, ph[i].warningMassage(),"Warning", JOptionPane.WARNING_MESSAGE);
+            Phrase[] allPhrases = {new Minute(), new Hour(), new DayOfMonth(), new Month(), new DayOfWeek(), new Season()};
+            StringBuilder massage = new StringBuilder("Каждую(ый)");
+            for (int i = userInput.length - 1; i >= 0; i--) {
+                Phrase phrase = allPhrases[i];
+                String input = userInput[i];
+                if (phrase.checkValue(input)) {
+                    JOptionPane.showMessageDialog(null, phrase.warningMassage(),"Warning", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-                massage.append(ph[i].getPhrase(userInput.get(i))).append(" ");
+                massage.append(phrase.getPhrase(input)).append(" ");
             }
 
             if(!leftArea.getText().isEmpty()){

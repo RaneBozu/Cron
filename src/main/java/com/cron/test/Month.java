@@ -1,4 +1,4 @@
-package CornTranslator;
+package com.cron.test;
 
 public class Month implements Phrase {
 
@@ -12,8 +12,8 @@ public class Month implements Phrase {
         return "Введиете корректный месяц(1-12)";
     }
 
+    @Override
     public String getPhrase(String phrase) {
-
         if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
             return "месяц,";
         }
