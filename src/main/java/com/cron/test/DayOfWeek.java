@@ -1,4 +1,4 @@
-package CornTranslator;
+package com.cron.test;
 
 public class DayOfWeek implements Phrase {
 
@@ -14,7 +14,6 @@ public class DayOfWeek implements Phrase {
 
     @Override
     public String getPhrase(String phrase) {
-
         if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
             return "день недели,";
         }

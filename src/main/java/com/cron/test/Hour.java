@@ -1,4 +1,4 @@
-package CornTranslator;
+package com.cron.test;
 
 public class Hour implements Phrase {
 
@@ -12,8 +12,8 @@ public class Hour implements Phrase {
         return "Введиете корректное колличество часов(0-24)";
     }
 
+    @Override
     public String getPhrase(String phrase) {
-
         if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
             return "час,";
         } else {

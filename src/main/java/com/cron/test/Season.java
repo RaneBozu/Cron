@@ -1,4 +1,4 @@
-package CornTranslator;
+package com.cron.test;
 
 public class Season implements Phrase {
 
