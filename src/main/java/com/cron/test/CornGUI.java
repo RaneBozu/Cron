@@ -1,76 +1,122 @@
 package com.cron.test;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class CornGUI extends JFrame {
-    private JButton button = new JButton("Check");
-    private JTextArea leftArea = new JTextArea(2, 27);
-    private JTextArea rightArea = new JTextArea(2, 27);
-    private JLabel infoLabel = new JLabel
-            ("Введите запрос: параметры разделенные пробелом.(минуты, часы, день месяца, месяц, день недели, сезон)");
-    private JLabel infoLabel1 = new JLabel("Выполнять задание");
-    private JPanel panel1 = new JPanel();
-    private JPanel panel2 = new JPanel();
+    private JTextArea cronArea = new JTextArea(20, 30);
+    private JTextArea humanArea = new JTextArea(20, 30);
+    private DefaultListModel<String> dfm = new DefaultListModel<>();
+    private JList<String> historyList = new JList<>(dfm);
 
     CornGUI() throws HeadlessException {
         super("Corn");
 
-        this.setBounds(200, 200, 800, 300);
+        this.setBounds(200, 200, 1100, 500);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        panel1.setLayout(new BorderLayout());
+        JPanel leftPanel = new JPanel();
+        JPanel midPanel = new JPanel();
+        JPanel rightPanel = new JPanel();
+        JPanel buttonPanel = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(historyList);
+        JLabel infoLabel = new JLabel
+                ("Введите запрос: параметры разделенные пробелом.(минуты, часы, день месяца, месяц, день недели, сезон)");
+
         Container container = this.getContentPane();
         container.setBackground(Color.LIGHT_GRAY);
-        panel1.setBackground(Color.LIGHT_GRAY);
-        panel2.setBackground(Color.LIGHT_GRAY);
-        container.setLayout(new BorderLayout());
-        container.add(panel1, BorderLayout.WEST);
-        container.add(panel2, BorderLayout.EAST);
-        panel1.add(leftArea, BorderLayout.NORTH);
-        panel2.add(rightArea, BorderLayout.NORTH);
+        container.add(leftPanel, BorderLayout.WEST);
+        container.add(midPanel, BorderLayout.CENTER);
+        container.add(rightPanel, BorderLayout.EAST);
         container.add(infoLabel, BorderLayout.NORTH);
-        container.add(infoLabel1, BorderLayout.CENTER);
-        container.add(button, BorderLayout.SOUTH);
+
+        leftPanel.setBackground(Color.LIGHT_GRAY);
+        leftPanel.add(cronArea, BorderLayout.NORTH);
+
+        rightPanel.setBackground(Color.LIGHT_GRAY);
+        rightPanel.add(scrollPane, BorderLayout.WEST);
+
+        midPanel.setBackground(Color.LIGHT_GRAY);
+        midPanel.add(humanArea, BorderLayout.NORTH);
+        midPanel.add(buttonPanel, BorderLayout.CENTER);
+
+        buttonPanel.setBackground(Color.LIGHT_GRAY);
+        JButton button = new JButton("Check");
+        buttonPanel.add(button, BorderLayout.WEST);
+
+        scrollPane.setPreferredSize(new Dimension(300,400));
+        historyList.setLayoutOrientation(JList.VERTICAL);
+        humanArea.setLineWrap(true);
+        humanArea.setWrapStyleWord(true);
+
         button.addActionListener(new ButtonListener());
+        historyList.addListSelectionListener(new ListListener());
     }
 
     class ButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            Phrase[] allPhrase = {new Minute(), new Hour(), new DayOfMonth(), new Month(), new DayOfWeek(), new Season()};
+            StringBuilder massage = new StringBuilder();
             String[] userInput;
-            if(!leftArea.getText().isEmpty()){
-                userInput = leftArea.getText().split(" ");
-            } else {
-                userInput = rightArea.getText().split(" ");
-            }
 
-            if (!leftArea.getText().isEmpty() && !rightArea.getText().isEmpty() || userInput.length > 6) {
-                JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле, либо введено слишком много параметров",
-                        "Warning", JOptionPane.WARNING_MESSAGE);
+            if (!cronArea.getText().isEmpty() && !humanArea.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            Phrase[] allPhrases = {new Minute(), new Hour(), new DayOfMonth(), new Month(), new DayOfWeek(), new Season()};
-            StringBuilder massage = new StringBuilder("Каждую(ый)");
-            for (int i = userInput.length - 1; i >= 0; i--) {
-                Phrase phrase = allPhrases[i];
-                String input = userInput[i];
-                if (phrase.checkValue(input)) {
-                    JOptionPane.showMessageDialog(null, phrase.warningMassage(),"Warning", JOptionPane.WARNING_MESSAGE);
-                    return;
+            if (!cronArea.getText().isEmpty()) {
+                userInput = cronArea.getText().split(" ");
+                for (int i = 0; i <= userInput.length - 1; i++) {
+                    Phrase phrase = allPhrase[i];
+                    String input = userInput[i];
+                    if (phrase.checkCornValue(input)) {
+                        JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    massage.append(phrase.getHumanPhrase(input)).append(", ");
                 }
-                massage.append(phrase.getPhrase(input)).append(" ");
+            } else {
+                userInput = humanArea.getText().split(", ");
+                for (int i = 0; i <= userInput.length - 1; i++) {
+                    Phrase phrase = allPhrase[i];
+                    String input = userInput[i];
+                    if (phrase.checkHumanValue(input)) {
+                        JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    massage.append(phrase.getCronPhrase(input)).append(" ");
+                }
             }
 
-            if(!leftArea.getText().isEmpty()){
-                rightArea.append(massage.toString());
-                leftArea.setText(null);
+            if (!cronArea.getText().isEmpty()) {
+                humanArea.append(massage.toString());
+                dfm.addElement(cronArea.getText() + " -> " + humanArea.getText() + "\n");
+                cronArea.setText(null);
             } else {
-                leftArea.append(massage.toString());
-                rightArea.setText(null);
+                cronArea.append(massage.toString());
+                dfm.addElement(cronArea.getText() + " <- " + humanArea.getText() + "\n");
+                humanArea.setText(null);
+            }
+        }
+    }
+    class ListListener implements ListSelectionListener{
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            String[] value;
+            if(historyList.getSelectedValue().contains("->")) {
+                value = historyList.getSelectedValue().split("->");
+                cronArea.setText(value[0]);
+                humanArea.setText(value[1]);
+            } else {
+                value = historyList.getSelectedValue().split("<-");
+                cronArea.setText(value[0]);
+                humanArea.setText(value[1]);
             }
         }
     }

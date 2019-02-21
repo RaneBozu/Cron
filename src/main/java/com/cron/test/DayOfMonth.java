@@ -3,21 +3,36 @@ package com.cron.test;
 public class DayOfMonth implements Phrase {
 
     @Override
-    public boolean checkValue(String phrase) {
+    public boolean checkCornValue(String phrase) {
         return !phrase.matches("[0-2]?[0-9]|31|30|\\*") || phrase.equals("0");
     }
 
     @Override
-    public String warningMassage() {
-        return "Введиете корректный день месяца(1-31)";
+    public boolean checkHumanValue(String phrase) {
+        return !phrase.matches(".*кажд.*|.*[0-2]?[0-9].*числа.*|.*31.*числа.*|.*30.*числа.*");
     }
 
     @Override
-    public String getPhrase(String phrase) {
+    public String warningMassage() {
+        return "Введиете корректное значение для поля \"день месяца\"";
+    }
+
+    @Override
+    public String getHumanPhrase(String phrase) {
         if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
-            return "день месяца,";
+            return "каждый день месяца";
         } else {
-            return phrase + " числа,";
+            return phrase + " числа";
+        }
+    }
+
+    @Override
+    public String getCronPhrase(String phrase) {
+        if (phrase.matches(".*каждый.*")) {
+            return Cron.EVERY_PERIOD_OF_TIME;
+        } else {
+            phrase = phrase.trim();
+            return phrase.replaceAll("\\D+", "");
         }
     }
 }
