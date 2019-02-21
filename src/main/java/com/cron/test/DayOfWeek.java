@@ -1,39 +1,54 @@
 package com.cron.test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class DayOfWeek implements Phrase {
 
+    private List<String> daysOfWeek = new ArrayList<>(Arrays.asList("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"));
+
     @Override
-    public boolean checkValue(String phrase) {
+    public boolean checkCornValue(String phrase) {
         return !phrase.matches("[1-7]|\\*");
     }
 
     @Override
-    public String warningMassage() {
-        return "Введиете корректный день недели(1-7)";
+    public boolean checkHumanValue(String phrase) {
+        for (String dayOfWeek : daysOfWeek) {
+            if (phrase.contains(dayOfWeek)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
-    public String getPhrase(String phrase) {
+    public String warningMassage() {
+        return "Введиете корректное значение для поля \"день недели\"";
+    }
+
+    @Override
+    public String getHumanPhrase(String phrase) {
         if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
-            return "день недели,";
+            return "каждый день недели";
+        } else {
+            int temp = Integer.parseInt(phrase);
+            return daysOfWeek.get(temp - 1);
         }
-        switch (phrase) {
-            case "1":
-                return "Понедельник,";
-            case "2":
-                return "Вторник,";
-            case "3":
-                return "Среда,";
-            case "4":
-                return "Четверг,";
-            case "5":
-                return "Пятница,";
-            case "6":
-                return "Суббота,";
-            case "7":
-                return "Воскресенье,";
-            default:
-                return "";
+    }
+
+    @Override
+    public String getCronPhrase(String phrase) {
+        if (phrase.matches(".*каждый.*")) {
+            return Cron.EVERY_PERIOD_OF_TIME;
+        } else {
+            for (int i = 0; i < daysOfWeek.size(); i++) {
+                if (phrase.contains(daysOfWeek.get(i))) {
+                    return Integer.toString(i + 1);
+                }
+            }
         }
+        return "";
     }
 }

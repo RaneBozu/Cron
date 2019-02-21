@@ -1,7 +1,9 @@
 package com.cron.test;
 
 public interface Phrase {
-    boolean checkValue(String phrase);
+    boolean checkCornValue(String phrase);
+    boolean checkHumanValue(String phrase);
     String warningMassage();
-    String getPhrase(String phrase);
+    String getHumanPhrase(String phrase);
+    String getCronPhrase(String phrase);
 }

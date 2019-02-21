@@ -3,21 +3,36 @@ package com.cron.test;
 public class Hour implements Phrase {
 
     @Override
-    public boolean checkValue(String phrase) {
+    public boolean checkCornValue(String phrase) {
         return !phrase.matches("[0-9]|[0-1]?[0-9]|20|21|22|23|24|\\*");
     }
 
     @Override
-    public String warningMassage() {
-        return "Введиете корректное колличество часов(0-24)";
+    public boolean checkHumanValue(String phrase) {
+        return !phrase.matches(".*кажд.*|.*[0-9].*час.*|.*[0-1]?[0-9].*час.*|.*20.*час.*|.*21.*час.*|.*22.*час.*|.*23.*час.*|.*24.*час.*");
     }
 
     @Override
-    public String getPhrase(String phrase) {
+    public String warningMassage() {
+        return "Введиете корректное значение для поля \"часы\"";
+    }
+
+    @Override
+    public String getHumanPhrase(String phrase) {
         if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
-            return "час,";
+            return "каждый час";
         } else {
-            return phrase + " час(ов),";
+            return phrase + " час(ов)";
+        }
+    }
+
+    @Override
+    public String getCronPhrase(String phrase) {
+        if (phrase.matches(".*каждый.*")) {
+            return Cron.EVERY_PERIOD_OF_TIME;
+        } else {
+            phrase = phrase.trim();
+            return phrase.replaceAll("\\D+", "");
         }
     }
 }
