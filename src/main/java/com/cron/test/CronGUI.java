@@ -60,6 +60,9 @@ class CronGUI extends JFrame {
     }
 
     class ButtonListener implements ActionListener {
+        /**
+         * Translates the query between Cron and human language
+         * */
         @Override
         public void actionPerformed(ActionEvent e) {
             Phrase[] allPhrase = {new Minute(), new Hour(), new DayOfMonth(), new Month(), new DayOfWeek(), new Season()};
@@ -125,6 +128,9 @@ class CronGUI extends JFrame {
 
     class ListListener implements ListSelectionListener {
 
+        /**
+         * Shows the original query
+         * */
         @Override
         public void valueChanged(ListSelectionEvent e) {
             String[] value;
