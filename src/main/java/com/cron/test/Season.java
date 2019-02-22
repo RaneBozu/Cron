@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Season implements Phrase {
+
     private List<String> seasons = new ArrayList<>(Arrays.asList("Зима", "Весна", "Лето", "Осень"));
 
     @Override
