@@ -6,14 +6,16 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.Socket;
 
-class CornGUI extends JFrame {
+class CronGUI extends JFrame {
     private JTextArea cronArea = new JTextArea(20, 30);
     private JTextArea humanArea = new JTextArea(20, 30);
     private DefaultListModel<String> dfm = new DefaultListModel<>();
     private JList<String> historyList = new JList<>(dfm);
 
-    CornGUI() throws HeadlessException {
+    CronGUI() throws HeadlessException {
         super("Corn");
 
         this.setBounds(200, 200, 1100, 500);
@@ -48,7 +50,7 @@ class CornGUI extends JFrame {
         JButton button = new JButton("Check");
         buttonPanel.add(button, BorderLayout.WEST);
 
-        scrollPane.setPreferredSize(new Dimension(300,400));
+        scrollPane.setPreferredSize(new Dimension(300, 400));
         historyList.setLayoutOrientation(JList.VERTICAL);
         humanArea.setLineWrap(true);
         humanArea.setWrapStyleWord(true);
@@ -61,55 +63,72 @@ class CornGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             Phrase[] allPhrase = {new Minute(), new Hour(), new DayOfMonth(), new Month(), new DayOfWeek(), new Season()};
-            StringBuilder massage = new StringBuilder();
+            String massage = "";
             String[] userInput;
 
-            if (!cronArea.getText().isEmpty() && !humanArea.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле", "Warning", JOptionPane.WARNING_MESSAGE);
-                return;
+            try (Socket socket = new Socket("127.0.0.1", 8050);
+                 ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
+                 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                 ObjectInputStream is = new ObjectInputStream(socket.getInputStream())) {
+
+                if (!cronArea.getText().isEmpty() && !humanArea.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле", "Warning", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                if (!cronArea.getText().isEmpty()) {
+                    userInput = cronArea.getText().split(" ");
+                    os.writeObject(userInput);
+
+                    bw.write("1");
+                    bw.newLine();
+                    bw.flush();
+                    for (int i = 0; i <= userInput.length - 1; i++) {
+                        Phrase phrase = allPhrase[i];
+                        if (phrase.checkCornValue(userInput[i])) {
+                            JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    massage = (String) is.readObject();
+                } else {
+                    userInput = humanArea.getText().split(", ");
+                    os.writeObject(userInput);
+
+                    bw.write("2");
+                    bw.newLine();
+                    bw.flush();
+                    for (int i = 0; i <= userInput.length - 1; i++) {
+                        Phrase phrase = allPhrase[i];
+                        if (phrase.checkHumanValue(userInput[i])) {
+                            JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    massage = (String) is.readObject();
+                }
+            } catch (IOException | ClassNotFoundException ex) {
+                ex.printStackTrace();
             }
 
             if (!cronArea.getText().isEmpty()) {
-                userInput = cronArea.getText().split(" ");
-                for (int i = 0; i <= userInput.length - 1; i++) {
-                    Phrase phrase = allPhrase[i];
-                    String input = userInput[i];
-                    if (phrase.checkCornValue(input)) {
-                        JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                    massage.append(phrase.getHumanPhrase(input)).append(", ");
-                }
-            } else {
-                userInput = humanArea.getText().split(", ");
-                for (int i = 0; i <= userInput.length - 1; i++) {
-                    Phrase phrase = allPhrase[i];
-                    String input = userInput[i];
-                    if (phrase.checkHumanValue(input)) {
-                        JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                    massage.append(phrase.getCronPhrase(input)).append(" ");
-                }
-            }
-
-            if (!cronArea.getText().isEmpty()) {
-                humanArea.append(massage.toString());
+                humanArea.append(massage);
                 dfm.addElement(cronArea.getText() + " -> " + humanArea.getText() + "\n");
                 cronArea.setText(null);
             } else {
-                cronArea.append(massage.toString());
+                cronArea.append(massage);
                 dfm.addElement(cronArea.getText() + " <- " + humanArea.getText() + "\n");
                 humanArea.setText(null);
             }
         }
     }
-    class ListListener implements ListSelectionListener{
+
+    class ListListener implements ListSelectionListener {
 
         @Override
         public void valueChanged(ListSelectionEvent e) {
             String[] value;
-            if(historyList.getSelectedValue().contains("->")) {
+            if (historyList.getSelectedValue().contains("->")) {
                 value = historyList.getSelectedValue().split("->");
                 cronArea.setText(value[0]);
                 humanArea.setText(value[1]);

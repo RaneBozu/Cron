@@ -8,7 +8,7 @@ public class Cron {
     public static void main(String[] args) {
 
         SwingUtilities.invokeLater(() -> {
-            CornGUI gui = new CornGUI();
+            CronGUI gui = new CronGUI();
             gui.setVisible(true);
         });
     }
