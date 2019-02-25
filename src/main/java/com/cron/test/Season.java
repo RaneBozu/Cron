@@ -1,10 +1,11 @@
 package com.cron.test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Season implements Phrase {
+public class Season implements Phrase, Serializable {
 
     private List<String> seasons = new ArrayList<>(Arrays.asList("Зима", "Весна", "Лето", "Осень"));
 
@@ -15,12 +16,7 @@ public class Season implements Phrase {
 
     @Override
     public boolean checkHumanValue(String phrase) {
-        for (String season : seasons) {
-            if (phrase.contains(season)) {
-                return false;
-            }
-        }
-        return true;
+        return !seasons.contains(phrase);
     }
 
     @Override
@@ -43,12 +39,7 @@ public class Season implements Phrase {
         if (phrase.matches(".*каждый.*")) {
             return Cron.EVERY_PERIOD_OF_TIME;
         } else {
-            for (int i = 0; i < seasons.size(); i++) {
-                if (phrase.contains(seasons.get(i))) {
-                    return Integer.toString(i + 1);
-                }
-            }
+            return Integer.toString(seasons.indexOf(phrase) + 1);
         }
-        return "";
     }
 }

@@ -1,10 +1,11 @@
 package com.cron.test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Month implements Phrase {
+public class Month implements Phrase, Serializable {
 
     private List<String> months = new ArrayList<>(Arrays.asList("Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октабрь", "Ноябрь", "Декабрь"));
 
@@ -15,12 +16,7 @@ public class Month implements Phrase {
 
     @Override
     public boolean checkHumanValue(String phrase) {
-        for (String dayOfWeek : months) {
-            if (phrase.contains(dayOfWeek)) {
-                return false;
-            }
-        }
-        return true;
+        return !months.contains(phrase);
     }
 
     @Override
@@ -43,14 +39,7 @@ public class Month implements Phrase {
         if (phrase.matches(".*каждый.*")) {
             return Cron.EVERY_PERIOD_OF_TIME;
         } else {
-            for (int i = 0; i < months.size(); i++) {
-                if (phrase.contains(months.get(i))) {
-                    return Integer.toString(i + 1);
-                }
-            }
+            return Integer.toString(months.indexOf(phrase) + 1);
         }
-        return "";
     }
 }
-
-

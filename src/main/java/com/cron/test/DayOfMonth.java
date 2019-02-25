@@ -1,6 +1,8 @@
 package com.cron.test;
 
-public class DayOfMonth implements Phrase {
+import java.io.Serializable;
+
+public class DayOfMonth implements Phrase, Serializable {
 
     @Override
     public boolean checkCornValue(String phrase) {
