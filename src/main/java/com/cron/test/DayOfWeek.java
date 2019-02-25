@@ -1,10 +1,11 @@
 package com.cron.test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class DayOfWeek implements Phrase {
+public class DayOfWeek implements Phrase, Serializable {
 
     private List<String> daysOfWeek = new ArrayList<>(Arrays.asList("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"));
 
@@ -15,12 +16,7 @@ public class DayOfWeek implements Phrase {
 
     @Override
     public boolean checkHumanValue(String phrase) {
-        for (String dayOfWeek : daysOfWeek) {
-            if (phrase.contains(dayOfWeek)) {
-                return false;
-            }
-        }
-        return true;
+        return !daysOfWeek.contains(phrase);
     }
 
     @Override
@@ -43,12 +39,7 @@ public class DayOfWeek implements Phrase {
         if (phrase.matches(".*каждый.*")) {
             return Cron.EVERY_PERIOD_OF_TIME;
         } else {
-            for (int i = 0; i < daysOfWeek.size(); i++) {
-                if (phrase.contains(daysOfWeek.get(i))) {
-                    return Integer.toString(i + 1);
-                }
-            }
+            return Integer.toString(daysOfWeek.indexOf(phrase) + 1);
         }
-        return "";
     }
 }

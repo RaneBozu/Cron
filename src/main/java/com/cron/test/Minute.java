@@ -1,6 +1,8 @@
 package com.cron.test;
 
-public class Minute implements Phrase {
+import java.io.Serializable;
+
+public class Minute implements Phrase, Serializable {
 
     @Override
     public boolean checkCornValue(String phrase) {

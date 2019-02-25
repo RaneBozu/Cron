@@ -6,7 +6,9 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 class CronGUI extends JFrame {
@@ -61,57 +63,54 @@ class CronGUI extends JFrame {
 
     class ButtonListener implements ActionListener {
         /**
-         * Translates the query between Cron and human language
-         * */
+         * Sends a request to translate a message
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
+
             Phrase[] allPhrase = {new Minute(), new Hour(), new DayOfMonth(), new Month(), new DayOfWeek(), new Season()};
             String massage = "";
             String[] userInput;
+            Translator translator;
 
+            if (!cronArea.getText().isEmpty() && !humanArea.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле", "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (!cronArea.getText().isEmpty()) {
+                userInput = cronArea.getText().split(" ");
+                for (int i = 0; i <= userInput.length - 1; i++) {
+                    Phrase phrase = allPhrase[i];
+                    if (phrase.checkCornValue(userInput[i])) {
+                        JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                }
+                translator = new Translator(userInput, allPhrase);
+                translator.setCheckType(true);
+            } else {
+                userInput = humanArea.getText().split(", ");
+                for (int i = 0; i <= userInput.length - 1; i++) {
+                    Phrase phrase = allPhrase[i];
+                    if (phrase.checkHumanValue(userInput[i])) {
+                        JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                }
+                translator = new Translator(userInput, allPhrase);
+                translator.setCheckType(false);
+
+            }
             try (Socket socket = new Socket("127.0.0.1", 8050);
                  ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
-                 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                  ObjectInputStream is = new ObjectInputStream(socket.getInputStream())) {
 
-                if (!cronArea.getText().isEmpty() && !humanArea.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле", "Warning", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
+                os.writeObject(translator);
+                massage = (String) is.readObject();
 
-                if (!cronArea.getText().isEmpty()) {
-                    userInput = cronArea.getText().split(" ");
-                    os.writeObject(userInput);
-
-                    bw.write("1");
-                    bw.newLine();
-                    bw.flush();
-                    for (int i = 0; i <= userInput.length - 1; i++) {
-                        Phrase phrase = allPhrase[i];
-                        if (phrase.checkCornValue(userInput[i])) {
-                            JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
-                            return;
-                        }
-                    }
-                    massage = (String) is.readObject();
-                } else {
-                    userInput = humanArea.getText().split(", ");
-                    os.writeObject(userInput);
-
-                    bw.write("2");
-                    bw.newLine();
-                    bw.flush();
-                    for (int i = 0; i <= userInput.length - 1; i++) {
-                        Phrase phrase = allPhrase[i];
-                        if (phrase.checkHumanValue(userInput[i])) {
-                            JOptionPane.showMessageDialog(null, phrase.warningMassage(), "Warning", JOptionPane.WARNING_MESSAGE);
-                            return;
-                        }
-                    }
-                    massage = (String) is.readObject();
-                }
-            } catch (IOException | ClassNotFoundException ex) {
-                ex.printStackTrace();
+            } catch (IOException | ClassNotFoundException e1) {
+                e1.printStackTrace();
             }
 
             if (!cronArea.getText().isEmpty()) {
@@ -130,7 +129,7 @@ class CronGUI extends JFrame {
 
         /**
          * Shows the original query
-         * */
+         */
         @Override
         public void valueChanged(ListSelectionEvent e) {
             String[] value;
