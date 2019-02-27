@@ -1,4 +1,4 @@
-package com.cron.test;
+package com.alexmail.cron;
 
 public interface Phrase {
 

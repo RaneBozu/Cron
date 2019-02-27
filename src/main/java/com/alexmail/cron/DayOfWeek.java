@@ -1,13 +1,12 @@
-package com.cron.test;
+package com.alexmail.cron;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class DayOfWeek implements Phrase, Serializable {
 
-    private List<String> daysOfWeek = new ArrayList<>(Arrays.asList("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"));
+    private List<String> daysOfWeek = Arrays.asList("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье");
 
     @Override
     public boolean checkCornValue(String phrase) {

@@ -1,13 +1,12 @@
-package com.cron.test;
+package com.alexmail.cron;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Month implements Phrase, Serializable {
 
-    private List<String> months = new ArrayList<>(Arrays.asList("Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октабрь", "Ноябрь", "Декабрь"));
+    private List<String> months = Arrays.asList("Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октабрь", "Ноябрь", "Декабрь");
 
     @Override
     public boolean checkCornValue(String phrase) {

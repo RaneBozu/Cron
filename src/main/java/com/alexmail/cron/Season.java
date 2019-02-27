@@ -1,13 +1,12 @@
-package com.cron.test;
+package com.alexmail.cron;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Season implements Phrase, Serializable {
 
-    private List<String> seasons = new ArrayList<>(Arrays.asList("Зима", "Весна", "Лето", "Осень"));
+    private List<String> seasons = Arrays.asList("Зима", "Весна", "Лето", "Осень");
 
     @Override
     public boolean checkCornValue(String phrase) {
