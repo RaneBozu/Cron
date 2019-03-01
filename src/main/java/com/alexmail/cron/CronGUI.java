@@ -82,7 +82,7 @@ class CronGUI extends JFrame {
                 request.setCronMsg(false);
             }
 
-            Connection connection = new Connection();
+            Connection connection = new HttpConnection();
             request = connection.setConnection(request);
 
             if(request.isErrorMsg()) {
@@ -132,10 +132,12 @@ class CronGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
 
+            Request request = new Request("History");
+            Connection connection = new HttpConnection();
+
             historyList.removeListSelectionListener(listListener);
             listModel.clear();
-            Request request = new Request("History");
-            Connection connection = new Connection();
+
             request = connection.setConnection(request);
 
             CopyOnWriteArrayList<String> history = request.getHistoryList();

@@ -5,10 +5,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class ServerWorkThread extends Thread {
+public class ServerWork extends Thread {
     private Socket socket;
 
-    ServerWorkThread(Socket socket) {
+    ServerWork(Socket socket) {
         this.socket = socket;
     }
 
@@ -17,12 +17,11 @@ public class ServerWorkThread extends Thread {
             ObjectInputStream is = new ObjectInputStream(socket.getInputStream())){
 
             Request request;
-            Translator translator;
             History history = History.getInstance();
 
             request = (Request) is.readObject();
             if(request.getHeader().equals("Translate")) {
-                translator = new Translator(request);
+                Translator translator = new Translator(request);
                 request.setOutputMsg(translator.getTranslate());
                 history.addHistory(request);
                 os.writeObject(request);

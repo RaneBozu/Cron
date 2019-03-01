@@ -8,7 +8,7 @@ public class CronServer {
 
         try (ServerSocket serverSocket = new ServerSocket(8050)) {
             while (true) {
-                new ServerWorkThread(serverSocket.accept()).start();
+                new ServerWork(serverSocket.accept()).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
