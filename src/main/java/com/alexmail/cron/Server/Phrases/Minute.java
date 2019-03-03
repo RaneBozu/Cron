@@ -1,8 +1,10 @@
-package com.alexmail.cron;
+package com.alexmail.cron.Server.Phrases;
+
+import com.alexmail.cron.Cron;
 
 import java.io.Serializable;
 
-public class Minute implements Phrase, Serializable {
+public class Minute implements Phrases, Serializable {
 
     @Override
     public boolean checkCornValue(String phrase) {

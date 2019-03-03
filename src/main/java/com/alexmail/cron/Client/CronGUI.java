@@ -1,4 +1,9 @@
-package com.alexmail.cron;
+package com.alexmail.cron.Client;
+
+import com.alexmail.cron.DTO.ConnectionType;
+import com.alexmail.cron.DTO.Request;
+import com.alexmail.cron.DTO.RequestType;
+import com.alexmail.cron.DTO.Response;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -6,15 +11,18 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 
-class CronGUI extends JFrame {
+public class CronGUI extends JFrame {
     private JTextArea cronArea = new JTextArea(20, 30);
     private JTextArea humanArea = new JTextArea(20, 30);
     private DefaultListModel<String> listModel = new DefaultListModel<>();
     private JList<String> historyList = new JList<>(listModel);
+    private RequestManager requestManager;
+    private Response response;
+    private Request request;
 
-    CronGUI() throws HeadlessException {
+    public CronGUI() throws HeadlessException {
         super("Corn");
 
         this.setBounds(200, 200, 1300, 500);
@@ -68,31 +76,30 @@ class CronGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            Request request = new Request("Translate");
+            request = new Request(RequestType.TRANSLATE, ConnectionType.HTTP);
             if (!cronArea.getText().isEmpty() && !humanArea.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             } else if (!cronArea.getText().isEmpty()) {
                 request.setInputMsg(cronArea.getText());
-                request.setUserInput(cronArea.getText());
                 request.setCronMsg(true);
             } else {
                 request.setInputMsg(humanArea.getText());
-                request.setUserInput(humanArea.getText());
                 request.setCronMsg(false);
             }
 
-            Connection connection = new HttpConnection();
-            request = connection.setConnection(request);
+            requestManager = new RequestManager(request);
+            requestManager.sendRequest();
+            response = requestManager.getResponse();
 
-            if(request.isErrorMsg()) {
-                JOptionPane.showMessageDialog(null, request.getOutputMsg(), "Warning", JOptionPane.WARNING_MESSAGE);
+            if(response.getErrorMsg() != null) {
+                JOptionPane.showMessageDialog(null, response.getErrorMsg(), "Warning", JOptionPane.WARNING_MESSAGE);
             } else if (request.isCronMsg()) {
                 cronArea.setText(null);
-                humanArea.setText(request.getOutputMsg());
+                humanArea.setText(response.getOutputMsg());
             } else {
                 humanArea.setText(null);
-                cronArea.setText(request.getOutputMsg());
+                cronArea.setText(response.getOutputMsg());
             }
         }
     }
@@ -132,15 +139,15 @@ class CronGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            Request request = new Request("History");
-            Connection connection = new HttpConnection();
-
             historyList.removeListSelectionListener(listListener);
             listModel.clear();
 
-            request = connection.setConnection(request);
+            request = new Request(RequestType.HISTORY, ConnectionType.HTTP);
+            requestManager = new RequestManager(request);
+            requestManager.sendRequest();
+            response = requestManager.getResponse();
 
-            CopyOnWriteArrayList<String> history = request.getHistoryList();
+            List<String> history = response.getHistoryList();
             for (String str : history) {
                 listModel.addElement(str);
             }

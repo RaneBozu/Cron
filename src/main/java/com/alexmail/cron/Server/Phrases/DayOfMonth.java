@@ -1,30 +1,32 @@
-package com.alexmail.cron;
+package com.alexmail.cron.Server.Phrases;
+
+import com.alexmail.cron.Cron;
 
 import java.io.Serializable;
 
-public class Hour implements Phrase, Serializable {
+public class DayOfMonth implements Phrases, Serializable {
 
     @Override
     public boolean checkCornValue(String phrase) {
-        return !phrase.matches("[0-9]|[0-1]?[0-9]|20|21|22|23|24|\\*");
+        return !phrase.matches("[0-2]?[0-9]|31|30|\\*") || phrase.equals("0");
     }
 
     @Override
     public boolean checkHumanValue(String phrase) {
-        return !phrase.matches(".*кажд.*|.*[0-9].*час.*|.*[0-1]?[0-9].*час.*|.*20.*час.*|.*21.*час.*|.*22.*час.*|.*23.*час.*|.*24.*час.*");
+        return !phrase.matches(".*кажд.*|.*[0-2]?[0-9].*числа.*|.*31.*числа.*|.*30.*числа.*");
     }
 
     @Override
     public String warningMassage() {
-        return "Введиете корректное значение для поля \"часы\"";
+        return "Введиете корректное значение для поля \"день месяца\"";
     }
 
     @Override
     public String getHumanPhrase(String phrase) {
         if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
-            return "каждый час";
+            return "каждый день месяца";
         } else {
-            return phrase + " час(ов)";
+            return phrase + " числа";
         }
     }
 

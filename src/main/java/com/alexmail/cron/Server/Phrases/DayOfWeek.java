@@ -1,10 +1,12 @@
-package com.alexmail.cron;
+package com.alexmail.cron.Server.Phrases;
+
+import com.alexmail.cron.Cron;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-public class DayOfWeek implements Phrase, Serializable {
+public class DayOfWeek implements Phrases, Serializable {
 
     private List<String> daysOfWeek = Arrays.asList("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье");
 

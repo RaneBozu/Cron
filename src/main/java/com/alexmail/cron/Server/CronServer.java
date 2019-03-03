@@ -1,4 +1,4 @@
-package com.alexmail.cron;
+package com.alexmail.cron.Server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,7 +8,7 @@ public class CronServer {
 
         try (ServerSocket serverSocket = new ServerSocket(8050)) {
             while (true) {
-                new ServerWork(serverSocket.accept()).start();
+                new RequestHandler(serverSocket.accept()).start();
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,6 +1,9 @@
-package com.alexmail.cron;
+package com.alexmail.cron.Server.Phrases;
 
-public interface Phrase {
+public interface Phrases {
+
+
+
 
     /**
      * Checking the validity of the Cron request
