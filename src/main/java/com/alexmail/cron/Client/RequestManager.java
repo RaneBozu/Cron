@@ -2,14 +2,18 @@ package com.alexmail.cron.Client;
 
 import com.alexmail.cron.DTO.ConnectionType;
 import com.alexmail.cron.DTO.Request;
+import com.alexmail.cron.DTO.RequestType;
 import com.alexmail.cron.DTO.Response;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.HttpURLConnection;
 import java.net.Socket;
-import java.net.URL;
 
 class RequestManager {
 
@@ -24,6 +28,7 @@ class RequestManager {
         return response;
     }
 
+
     void sendRequest(){
 
         if(request.getConnectionType().equals(ConnectionType.HTTP)){
@@ -33,6 +38,9 @@ class RequestManager {
         }
     }
 
+    /**
+     * Sends a request to the Simple server
+     * */
     private void sendSimpleRequest() {
         try (Socket socket = new Socket("127.0.0.1", 8050);
              ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
@@ -46,23 +54,32 @@ class RequestManager {
         }
     }
 
+    /**
+     * Sends a request to the HTTP server
+     * */
     private void sendHttpRequest() {
-        URL url;
-        try {
-            url = new URL("http://localhost:8000/translate");
-            HttpURLConnection urlCon = (HttpURLConnection) url.openConnection();
-            urlCon.setRequestMethod("POST");
-            urlCon.setDoOutput(true);
-            urlCon.setDoInput(true);
-            ObjectOutputStream out = new ObjectOutputStream(urlCon.getOutputStream());
-            out.writeObject(request);
-            out.close();
+        String url;
+        OkHttpClient client = new OkHttpClient();
+        Gson gson = new GsonBuilder().create();
+        String json = gson.toJson(request);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+        if(request.getRequestType().equals(RequestType.TRANSLATE)) {
+            url = "http://localhost:8000/translate";
+        } else {
+            url = "http://localhost:8000/history";
+        }
+        okhttp3.Request req = new okhttp3.Request.Builder().url(url).post(body).build();
 
-            ObjectInputStream ois = new ObjectInputStream(urlCon.getInputStream());
-            response = (Response) ois.readObject();
-            ois.close();
-        } catch (IOException | ClassNotFoundException e) {
+        try {
+            okhttp3.Response resp = client.newCall(req).execute();
+
+            if (resp.body() != null) {
+                json = resp.body().string();
+            }
+            response = gson.fromJson(json, Response.class);
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 }
