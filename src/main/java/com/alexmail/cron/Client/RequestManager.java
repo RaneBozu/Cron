@@ -20,22 +20,18 @@ class RequestManager {
     private Request request;
     private Response response;
 
-    RequestManager(Request request) {
+
+
+
+    Response sendRequest(Request request){
+
         this.request = request;
-    }
-
-    Response getResponse() {
-        return response;
-    }
-
-
-    void sendRequest(){
-
         if(request.getConnectionType().equals(ConnectionType.HTTP)){
             sendHttpRequest();
         } else {
             sendSimpleRequest();
         }
+        return response;
     }
 
     /**

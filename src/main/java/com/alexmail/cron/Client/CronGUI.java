@@ -18,7 +18,7 @@ public class CronGUI extends JFrame {
     private JTextArea humanArea = new JTextArea(20, 30);
     private DefaultListModel<String> listModel = new DefaultListModel<>();
     private JList<String> historyList = new JList<>(listModel);
-    private RequestManager requestManager;
+    private RequestManager requestManager = new RequestManager();
     private Response response;
     private Request request;
 
@@ -88,9 +88,7 @@ public class CronGUI extends JFrame {
                 request.setCronMsg(false);
             }
 
-            requestManager = new RequestManager(request);
-            requestManager.sendRequest();
-            response = requestManager.getResponse();
+            response = requestManager.sendRequest(request);
 
             if(response.getErrorMsg() != null) {
                 JOptionPane.showMessageDialog(null, response.getErrorMsg(), "Warning", JOptionPane.WARNING_MESSAGE);
@@ -115,11 +113,11 @@ public class CronGUI extends JFrame {
             String[] value;
             if (historyList.getSelectedValue().contains("->")) {
                 value = historyList.getSelectedValue().split(" -> ");
-                cronArea.setText(value[0]);
+                cronArea.setText(value[0].substring(22));
                 humanArea.setText(value[1]);
             } else {
                 value = historyList.getSelectedValue().split(" <- ");
-                cronArea.setText(value[0]);
+                cronArea.setText(value[0].substring(22));
                 humanArea.setText(value[1]);
             }
         }
@@ -140,13 +138,11 @@ public class CronGUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
 
             historyList.removeListSelectionListener(listListener);
-            listModel.clear();
-
             request = new Request(RequestType.HISTORY, ConnectionType.HTTP);
-            requestManager = new RequestManager(request);
-            requestManager.sendRequest();
-            response = requestManager.getResponse();
 
+            response = requestManager.sendRequest(request);
+
+            listModel.clear();
             List<String> history = response.getHistoryList();
             for (String str : history) {
                 listModel.addElement(str);
