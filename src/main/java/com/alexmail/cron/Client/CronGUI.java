@@ -18,14 +18,14 @@ public class CronGUI extends JFrame {
     private JTextArea humanArea = new JTextArea(20, 30);
     private DefaultListModel<String> listModel = new DefaultListModel<>();
     private JList<String> historyList = new JList<>(listModel);
-    private RequestManager requestManager;
+    private RequestManager requestManager = new RequestManager();
     private Response response;
     private Request request;
 
     public CronGUI() throws HeadlessException {
         super("Corn");
 
-        this.setBounds(200, 200, 1300, 500);
+        this.setBounds(200, 200, 1400, 500);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JButton button = new JButton("Check");
@@ -56,7 +56,7 @@ public class CronGUI extends JFrame {
         buttonPanel.setBackground(Color.LIGHT_GRAY);
         buttonPanel.add(button, BorderLayout.SOUTH);
 
-        scrollPane.setPreferredSize(new Dimension(500, 400));
+        scrollPane.setPreferredSize(new Dimension(600, 400));
         historyList.setLayoutOrientation(JList.VERTICAL);
         humanArea.setLineWrap(true);
         humanArea.setWrapStyleWord(true);
@@ -64,7 +64,7 @@ public class CronGUI extends JFrame {
         button.addActionListener(new ButtonListener());
         ListListener listListener = new ListListener();
         historyList.addListSelectionListener(listListener);
-        Timer timer = new Timer(5000, new TimerListener(listListener));
+        Timer timer = new Timer(3000, new TimerListener(listListener));
         timer.start();
     }
 
@@ -88,9 +88,7 @@ public class CronGUI extends JFrame {
                 request.setCronMsg(false);
             }
 
-            requestManager = new RequestManager(request);
-            requestManager.sendRequest();
-            response = requestManager.getResponse();
+            response = requestManager.sendRequest(request);
 
             if(response.getErrorMsg() != null) {
                 JOptionPane.showMessageDialog(null, response.getErrorMsg(), "Warning", JOptionPane.WARNING_MESSAGE);
@@ -115,11 +113,11 @@ public class CronGUI extends JFrame {
             String[] value;
             if (historyList.getSelectedValue().contains("->")) {
                 value = historyList.getSelectedValue().split(" -> ");
-                cronArea.setText(value[0]);
+                cronArea.setText(value[0].substring(22));
                 humanArea.setText(value[1]);
             } else {
                 value = historyList.getSelectedValue().split(" <- ");
-                cronArea.setText(value[0]);
+                cronArea.setText(value[0].substring(22));
                 humanArea.setText(value[1]);
             }
         }
@@ -140,13 +138,11 @@ public class CronGUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
 
             historyList.removeListSelectionListener(listListener);
-            listModel.clear();
-
             request = new Request(RequestType.HISTORY, ConnectionType.HTTP);
-            requestManager = new RequestManager(request);
-            requestManager.sendRequest();
-            response = requestManager.getResponse();
 
+            response = requestManager.sendRequest(request);
+
+            listModel.clear();
             List<String> history = response.getHistoryList();
             for (String str : history) {
                 listModel.addElement(str);
