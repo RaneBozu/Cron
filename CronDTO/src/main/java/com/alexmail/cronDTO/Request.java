@@ -8,16 +8,15 @@ public class Request implements Serializable {
     private boolean isCronMsg;
     private String inputMsg;
     private boolean reverseIsSelected;
+    private int historyID;
 
-    public int getNumOfHistoryRecords() {
-        return numOfHistoryRecords;
+    public int getHistoryID() {
+        return historyID;
     }
 
-    public void setNumOfHistoryRecords(int numOfHistoryRecords) {
-        this.numOfHistoryRecords = numOfHistoryRecords;
+    public void setHistoryID(int historyID) {
+        this.historyID = historyID;
     }
-
-    private int numOfHistoryRecords;
 
     public boolean isReverseIsSelected() {
         return reverseIsSelected;

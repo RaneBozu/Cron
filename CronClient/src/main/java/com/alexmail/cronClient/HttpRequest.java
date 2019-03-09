@@ -19,16 +19,12 @@ public class HttpRequest implements RequestManager {
     @Override
     public Response sendRequest(Request request) {
         Response response = new Response();
-        String url;
+        String url = "http://localhost:8000/" + request.getRequestType().getType();
         OkHttpClient client = new OkHttpClient();
         Gson gson = new GsonBuilder().create();
         String json = gson.toJson(request);
         RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
-        if(request.getRequestType().equals(RequestType.TRANSLATE)) {
-            url = "http://localhost:8000/translate";
-        } else {
-            url = "http://localhost:8000/history";
-        }
+        
         okhttp3.Request req = new okhttp3.Request.Builder().url(url).post(body).build();
         try {
             okhttp3.Response resp = client.newCall(req).execute();

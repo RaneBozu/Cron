@@ -26,7 +26,7 @@ public class HistoryResponse implements ResponseManager {
         Response response = new Response();
         List<History> historyList = new ArrayList<>();
         ResultSet resultSet;
-        int numOfRecords = request.getNumOfHistoryRecords();
+        int numOfRecords = request.getHistoryID();
         try {
             if(request.isReverseIsSelected()) {
                 resultSet = statement.executeQuery("SELECT * FROM history ORDER BY DATE DESC LIMIT " + numOfRecords);
@@ -35,7 +35,10 @@ public class HistoryResponse implements ResponseManager {
             }
 
             while (resultSet.next()) {
-                History history = new History(resultSet.getString(2), resultSet.getString(3), resultSet.getBoolean(4));
+                History history = new History(Integer.parseInt(resultSet.getString(1)),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getBoolean(4));
                 historyList.add(history);
             }
         } catch (SQLException e) {

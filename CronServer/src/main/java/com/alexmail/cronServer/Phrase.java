@@ -5,7 +5,6 @@ import java.util.List;
 
 public enum Phrase {
 
-
     MINUTE {
         @Override
         public boolean checkCornValue(String phrase) {

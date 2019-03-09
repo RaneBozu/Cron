@@ -26,6 +26,7 @@ public class CronHttpServer {
             Statement statement = conn.createStatement();
             server.createContext("/translate", new TranslationHandler(statement));
             server.createContext("/history", new HistoryHandler(statement));
+            server.createContext("/update_history", new UpdateHistoryHandler(statement));
             server.setExecutor(null);
             server.start();
         } catch (SQLException | IOException e) {
@@ -81,6 +82,33 @@ public class CronHttpServer {
                 request = gson.fromJson(json, Request.class);
 
                 Response response = new HistoryResponse(request).getResponse(statement);
+
+                byte[] buffer = gson.toJson(response).getBytes();
+                exchange.sendResponseHeaders(200, buffer.length);
+                os.write(buffer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static class UpdateHistoryHandler implements HttpHandler {
+        Statement statement;
+        UpdateHistoryHandler(Statement statement) {
+            this.statement = statement;
+        }
+
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            Gson gson = new GsonBuilder().create();
+            String json;
+            Request request;
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));
+                 OutputStream os = exchange.getResponseBody()) {
+                json = in.readLine();
+                request = gson.fromJson(json, Request.class);
+
+                Response response = new UpdateHistoryResponse(request).getResponse(statement);
 
                 byte[] buffer = gson.toJson(response).getBytes();
                 exchange.sendResponseHeaders(200, buffer.length);

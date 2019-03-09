@@ -14,28 +14,28 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 class CronGUI extends JFrame {
-    private JTextArea cronArea = new JTextArea(20, 30);
-    private JTextArea humanArea = new JTextArea(20, 30);
+    private JTextArea cronArea = new JTextArea(30, 30);
+    private JTextArea humanArea = new JTextArea(30, 30);
     private Integer[] num = {10, 20, 30};
     private JComboBox<Integer> numOfHistory = new JComboBox<>(num);
     private JCheckBox reverse;
     private DefaultListModel<History> listModel = new DefaultListModel<>();
     private JList<History> historyList = new JList<>(listModel);
     private RequestManager requestManager;
+    private int historyID;
     private Response response;
     private Request request;
 
     CronGUI() throws HeadlessException {
         super("Corn");
 
-        this.setBounds(200, 200, 1500, 550);
+        this.setBounds(200, 200, 1400, 550);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JButton button = new JButton("Check");
+        JButton translateButton = new JButton("Translate");
+        JButton updateButton = new JButton("Update");
         JPanel leftPanel = new JPanel();
-        JPanel midPanel = new JPanel();
         JPanel rightPanel = new JPanel();
-        JPanel buttonPanel = new JPanel();
         reverse = new JCheckBox("История в обратном порядке");
 
         JScrollPane scrollPane = new JScrollPane(historyList);
@@ -43,53 +43,65 @@ class CronGUI extends JFrame {
         JLabel numOfHistoryLabel = new JLabel("Количество записей");
 
         Container container = this.getContentPane();
-        container.setBackground(Color.LIGHT_GRAY);
         container.add(leftPanel, BorderLayout.WEST);
-        container.add(midPanel, BorderLayout.CENTER);
         container.add(rightPanel, BorderLayout.EAST);
         container.add(infoLabel, BorderLayout.NORTH);
 
-        leftPanel.setBackground(Color.LIGHT_GRAY);
-        leftPanel.add(cronArea, BorderLayout.NORTH);
+        leftPanel.setLayout(new GridBagLayout());
+        GridBagConstraints midPanelConstraints = new GridBagConstraints();
+        midPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        midPanelConstraints.gridx = 1;
+        midPanelConstraints.gridy = 0;
+        leftPanel.add(translateButton, midPanelConstraints);
 
-        rightPanel.setBackground(Color.LIGHT_GRAY);
+        midPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        midPanelConstraints.gridheight = 2;
+        midPanelConstraints.gridx = 0;
+        leftPanel.add(cronArea, midPanelConstraints);
+
+
+        midPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        midPanelConstraints.gridheight = 2;
+        midPanelConstraints.gridx = 2;
+        leftPanel.add(humanArea, midPanelConstraints);
+
+        midPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        midPanelConstraints.gridx = 1;
+        midPanelConstraints.gridy = 1;
+        leftPanel.add(updateButton, midPanelConstraints);
+
         rightPanel.setLayout(new GridBagLayout());
 
-        GridBagConstraints constraints = new GridBagConstraints();
+        GridBagConstraints rightPanelConstraints = new GridBagConstraints();
+        rightPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        rightPanelConstraints.gridx = 0;
+        rightPanel.add(reverse, rightPanelConstraints);
 
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 0;
-        rightPanel.add(reverse, constraints);
+        rightPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        rightPanelConstraints.weighty = 0.1;
+        rightPanelConstraints.gridx = 0;
+        rightPanelConstraints.gridy = 1;
+        rightPanel.add(numOfHistoryLabel, rightPanelConstraints);
 
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.weighty = 0.1;
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        rightPanel.add(numOfHistoryLabel, constraints);
+        rightPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        rightPanelConstraints.gridx = 2;
+        rightPanel.add(numOfHistory, rightPanelConstraints);
 
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 2;
-        rightPanel.add(numOfHistory, constraints);
-
-        constraints.weighty = 0.1;
-        constraints.gridwidth = 3;
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        rightPanel.add(scrollPane, constraints);
-
-        midPanel.setBackground(Color.LIGHT_GRAY);
-        midPanel.add(humanArea, BorderLayout.NORTH);
-        midPanel.add(buttonPanel, BorderLayout.CENTER);
-
-        buttonPanel.setBackground(Color.LIGHT_GRAY);
-        buttonPanel.add(button, BorderLayout.SOUTH);
+        rightPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        rightPanelConstraints.weighty = 0.1;
+        rightPanelConstraints.gridwidth = 3;
+        rightPanelConstraints.gridx = 0;
+        rightPanelConstraints.gridy = 2;
+        rightPanel.add(scrollPane, rightPanelConstraints);
 
         scrollPane.setPreferredSize(new Dimension(600, 400));
         historyList.setLayoutOrientation(JList.VERTICAL);
         humanArea.setLineWrap(true);
         humanArea.setWrapStyleWord(true);
 
-        button.addActionListener(new ButtonListener());
+        translateButton.addActionListener(new TranslateButtonListener());
+
+        updateButton.addActionListener(new UpdateButtonListener());
 
         ListListener listListener = new ListListener();
         historyList.addListSelectionListener(listListener);
@@ -97,7 +109,7 @@ class CronGUI extends JFrame {
         timer.start();
     }
 
-    private class ButtonListener implements ActionListener {
+    private class TranslateButtonListener implements ActionListener {
 
         /**
          * Sends a request to translate a message
@@ -125,9 +137,11 @@ class CronGUI extends JFrame {
             } else if (request.isCronMsg()) {
                 cronArea.setText(null);
                 humanArea.setText(response.getOutputMsg());
+                humanArea.setEditable(true);
             } else {
                 humanArea.setText(null);
                 cronArea.setText(response.getOutputMsg());
+                cronArea.setEditable(true);
             }
         }
     }
@@ -140,10 +154,15 @@ class CronGUI extends JFrame {
         @Override
         public void valueChanged(ListSelectionEvent e) {
 
+            historyID = historyList.getSelectedValue().getId();
             if (historyList.getSelectedValue().isCronMsg()) {
+                cronArea.setEditable(true);
+                humanArea.setEditable(false);
                 cronArea.setText(historyList.getSelectedValue().getInputMsg());
                 humanArea.setText(historyList.getSelectedValue().getOutputMsg());
             } else {
+                humanArea.setEditable(true);
+                cronArea.setEditable(false);
                 cronArea.setText(historyList.getSelectedValue().getOutputMsg());
                 humanArea.setText(historyList.getSelectedValue().getInputMsg());
             }
@@ -168,7 +187,7 @@ class CronGUI extends JFrame {
             requestManager = new HttpRequest();
             request = new Request(RequestType.HISTORY);
             request.setReverseIsSelected(reverse.isSelected());
-            request.setNumOfHistoryRecords((int)numOfHistory.getSelectedItem());
+            request.setHistoryID((int) numOfHistory.getSelectedItem());
 
             response = requestManager.sendRequest(request);
 
@@ -178,6 +197,37 @@ class CronGUI extends JFrame {
                 listModel.addElement(value);
             }
             historyList.addListSelectionListener(listListener);
+        }
+    }
+
+    private class UpdateButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            requestManager = new HttpRequest();
+            request = new Request(RequestType.UPDATE_HISTORY);
+            if (historyID == 0 || cronArea.isEditable() && humanArea.isEditable()) {
+                JOptionPane.showMessageDialog(null, "Выберите запись для изменения", "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            } else if (!humanArea.isEditable()) {
+                request.setInputMsg(cronArea.getText());
+                request.setCronMsg(true);
+            } else {
+                request.setInputMsg(humanArea.getText());
+                request.setCronMsg(false);
+            }
+            request.setHistoryID(historyID);
+
+            response = requestManager.sendRequest(request);
+
+            if (response.getErrorMsg() != null) {
+                JOptionPane.showMessageDialog(null, response.getErrorMsg(), "Warning", JOptionPane.WARNING_MESSAGE);
+            } else if (request.isCronMsg()) {
+                humanArea.setText(response.getOutputMsg());
+                humanArea.setEditable(true);
+            } else {
+                cronArea.setText(response.getOutputMsg());
+                cronArea.setEditable(true);
+            }
         }
     }
 }
