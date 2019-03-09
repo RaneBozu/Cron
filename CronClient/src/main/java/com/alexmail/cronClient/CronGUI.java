@@ -1,9 +1,9 @@
-package com.alexmail.cron.Client;
+package com.alexmail.cronClient;
 
-import com.alexmail.cron.DTO.ConnectionType;
-import com.alexmail.cron.DTO.Request;
-import com.alexmail.cron.DTO.RequestType;
-import com.alexmail.cron.DTO.Response;
+import com.alexmail.cronDTO.History;
+import com.alexmail.cronDTO.Request;
+import com.alexmail.cronDTO.RequestType;
+import com.alexmail.cronDTO.Response;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -13,19 +13,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class CronGUI extends JFrame {
+class CronGUI extends JFrame {
     private JTextArea cronArea = new JTextArea(20, 30);
     private JTextArea humanArea = new JTextArea(20, 30);
-    private DefaultListModel<String> listModel = new DefaultListModel<>();
-    private JList<String> historyList = new JList<>(listModel);
-    private RequestManager requestManager = new RequestManager();
+    private Integer[] num = {10, 20, 30};
+    private JComboBox<Integer> numOfHistory = new JComboBox<>(num);
+    private JCheckBox reverse;
+    private DefaultListModel<History> listModel = new DefaultListModel<>();
+    private JList<History> historyList = new JList<>(listModel);
+    private RequestManager requestManager;
     private Response response;
     private Request request;
 
-    public CronGUI() throws HeadlessException {
+    CronGUI() throws HeadlessException {
         super("Corn");
 
-        this.setBounds(200, 200, 1400, 500);
+        this.setBounds(200, 200, 1500, 550);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JButton button = new JButton("Check");
@@ -33,8 +36,11 @@ public class CronGUI extends JFrame {
         JPanel midPanel = new JPanel();
         JPanel rightPanel = new JPanel();
         JPanel buttonPanel = new JPanel();
+        reverse = new JCheckBox("История в обратном порядке");
+
         JScrollPane scrollPane = new JScrollPane(historyList);
         JLabel infoLabel = new JLabel("Введите запрос: от 1 до 6 параметров.(минуты, часы, день месяца, месяц, день недели, сезон)");
+        JLabel numOfHistoryLabel = new JLabel("Количество записей");
 
         Container container = this.getContentPane();
         container.setBackground(Color.LIGHT_GRAY);
@@ -47,7 +53,29 @@ public class CronGUI extends JFrame {
         leftPanel.add(cronArea, BorderLayout.NORTH);
 
         rightPanel.setBackground(Color.LIGHT_GRAY);
-        rightPanel.add(scrollPane, BorderLayout.WEST);
+        rightPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints constraints = new GridBagConstraints();
+
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridx = 0;
+        rightPanel.add(reverse, constraints);
+
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weighty = 0.1;
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        rightPanel.add(numOfHistoryLabel, constraints);
+
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridx = 2;
+        rightPanel.add(numOfHistory, constraints);
+
+        constraints.weighty = 0.1;
+        constraints.gridwidth = 3;
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        rightPanel.add(scrollPane, constraints);
 
         midPanel.setBackground(Color.LIGHT_GRAY);
         midPanel.add(humanArea, BorderLayout.NORTH);
@@ -62,9 +90,10 @@ public class CronGUI extends JFrame {
         humanArea.setWrapStyleWord(true);
 
         button.addActionListener(new ButtonListener());
+
         ListListener listListener = new ListListener();
         historyList.addListSelectionListener(listListener);
-        Timer timer = new Timer(3000, new TimerListener(listListener));
+        Timer timer = new Timer(5000, new TimerListener(listListener));
         timer.start();
     }
 
@@ -76,7 +105,8 @@ public class CronGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            request = new Request(RequestType.TRANSLATE, ConnectionType.HTTP);
+            requestManager = new HttpRequest();
+            request = new Request(RequestType.TRANSLATE);
             if (!cronArea.getText().isEmpty() && !humanArea.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -90,7 +120,7 @@ public class CronGUI extends JFrame {
 
             response = requestManager.sendRequest(request);
 
-            if(response.getErrorMsg() != null) {
+            if (response.getErrorMsg() != null) {
                 JOptionPane.showMessageDialog(null, response.getErrorMsg(), "Warning", JOptionPane.WARNING_MESSAGE);
             } else if (request.isCronMsg()) {
                 cronArea.setText(null);
@@ -110,15 +140,12 @@ public class CronGUI extends JFrame {
         @Override
         public void valueChanged(ListSelectionEvent e) {
 
-            String[] value;
-            if (historyList.getSelectedValue().contains("->")) {
-                value = historyList.getSelectedValue().split(" -> ");
-                cronArea.setText(value[0].substring(22));
-                humanArea.setText(value[1]);
+            if (historyList.getSelectedValue().isCronMsg()) {
+                cronArea.setText(historyList.getSelectedValue().getInputMsg());
+                humanArea.setText(historyList.getSelectedValue().getOutputMsg());
             } else {
-                value = historyList.getSelectedValue().split(" <- ");
-                cronArea.setText(value[0].substring(22));
-                humanArea.setText(value[1]);
+                cronArea.setText(historyList.getSelectedValue().getOutputMsg());
+                humanArea.setText(historyList.getSelectedValue().getInputMsg());
             }
         }
     }
@@ -138,14 +165,17 @@ public class CronGUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
 
             historyList.removeListSelectionListener(listListener);
-            request = new Request(RequestType.HISTORY, ConnectionType.HTTP);
+            requestManager = new HttpRequest();
+            request = new Request(RequestType.HISTORY);
+            request.setReverseIsSelected(reverse.isSelected());
+            request.setNumOfHistoryRecords((int)numOfHistory.getSelectedItem());
 
             response = requestManager.sendRequest(request);
 
             listModel.clear();
-            List<String> history = response.getHistoryList();
-            for (String str : history) {
-                listModel.addElement(str);
+            List<History> history = response.getHistoryList();
+            for (History value : history) {
+                listModel.addElement(value);
             }
             historyList.addListSelectionListener(listListener);
         }

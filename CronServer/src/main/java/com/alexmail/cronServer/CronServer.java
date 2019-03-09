@@ -1,4 +1,4 @@
-package com.alexmail.cron.Server;
+package com.alexmail.cronServer;
 
 import java.io.IOException;
 import java.net.ServerSocket;

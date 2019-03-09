@@ -1,4 +1,4 @@
-package com.alexmail.cron.DTO;
+package com.alexmail.cronDTO;
 
 public enum RequestType {
     TRANSLATE, HISTORY

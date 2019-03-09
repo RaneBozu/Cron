@@ -1,4 +1,4 @@
-package com.alexmail.cron.DTO;
+package com.alexmail.cronDTO;
 
 import java.io.Serializable;
 import java.util.List;
@@ -7,13 +7,13 @@ public class Response implements Serializable {
 
     private String errorMsg;
     private String outputMsg;
-    private List<String> historyList;
+    private List<History> historyList;
 
-    public void setHistoryList(List<String> historyList) {
+    public void setHistoryList(List<History> historyList) {
         this.historyList = historyList;
     }
 
-    public List<String> getHistoryList() {
+    public List<History> getHistoryList() {
         return historyList;
     }
 

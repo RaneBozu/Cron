@@ -1,11 +1,10 @@
-package com.alexmail.cron.Server;
-
-import com.alexmail.cron.Cron;
+package com.alexmail.cronServer;
 
 import java.util.Arrays;
 import java.util.List;
 
 public enum Phrase {
+
 
     MINUTE {
         @Override
@@ -25,7 +24,7 @@ public enum Phrase {
 
         @Override
         public String getHumanPhrase(String phrase) {
-            if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
+            if (phrase.equals(EVERY_PERIOD_OF_TIME)) {
                 return "каждую минуту";
             } else {
                 return phrase + " минут(у)";
@@ -35,7 +34,7 @@ public enum Phrase {
         @Override
         public String getCronPhrase(String phrase) {
             if (phrase.matches(".*каждую.*")) {
-                return Cron.EVERY_PERIOD_OF_TIME;
+                return EVERY_PERIOD_OF_TIME;
             } else {
                 phrase = phrase.trim();
                 return phrase.replaceAll("\\D+", "");
@@ -61,7 +60,7 @@ public enum Phrase {
 
         @Override
         public String getHumanPhrase(String phrase) {
-            if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
+            if (phrase.equals(EVERY_PERIOD_OF_TIME)) {
                 return "каждый час";
             } else {
                 return phrase + " час(ов)";
@@ -71,7 +70,7 @@ public enum Phrase {
         @Override
         public String getCronPhrase(String phrase) {
             if (phrase.matches(".*каждый.*")) {
-                return Cron.EVERY_PERIOD_OF_TIME;
+                return EVERY_PERIOD_OF_TIME;
             } else {
                 phrase = phrase.trim();
                 return phrase.replaceAll("\\D+", "");
@@ -97,7 +96,7 @@ public enum Phrase {
 
         @Override
         public String getHumanPhrase(String phrase) {
-            if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
+            if (phrase.equals(EVERY_PERIOD_OF_TIME)) {
                 return "каждый день месяца";
             } else {
                 return phrase + " числа";
@@ -107,7 +106,7 @@ public enum Phrase {
         @Override
         public String getCronPhrase(String phrase) {
             if (phrase.matches(".*каждый.*")) {
-                return Cron.EVERY_PERIOD_OF_TIME;
+                return EVERY_PERIOD_OF_TIME;
             } else {
                 phrase = phrase.trim();
                 return phrase.replaceAll("\\D+", "");
@@ -135,7 +134,7 @@ public enum Phrase {
 
         @Override
         public String getHumanPhrase(String phrase) {
-            if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
+            if (phrase.equals(EVERY_PERIOD_OF_TIME)) {
                 return "каждый месяц";
             } else {
                 int temp = Integer.parseInt(phrase);
@@ -146,7 +145,7 @@ public enum Phrase {
         @Override
         public String getCronPhrase(String phrase) {
             if (phrase.matches(".*каждый.*")) {
-                return Cron.EVERY_PERIOD_OF_TIME;
+                return EVERY_PERIOD_OF_TIME;
             } else {
                 return Integer.toString(months.indexOf(phrase) + 1);
             }
@@ -173,7 +172,7 @@ public enum Phrase {
 
         @Override
         public String getHumanPhrase(String phrase) {
-            if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
+            if (phrase.equals(EVERY_PERIOD_OF_TIME)) {
                 return "каждый сезон";
             } else {
                 int temp = Integer.parseInt(phrase);
@@ -184,7 +183,7 @@ public enum Phrase {
         @Override
         public String getCronPhrase(String phrase) {
             if (phrase.matches(".*каждый.*")) {
-                return Cron.EVERY_PERIOD_OF_TIME;
+                return EVERY_PERIOD_OF_TIME;
             } else {
                 return Integer.toString(seasons.indexOf(phrase) + 1);
             }
@@ -211,7 +210,7 @@ public enum Phrase {
 
         @Override
         public String getHumanPhrase(String phrase) {
-            if (phrase.equals(Cron.EVERY_PERIOD_OF_TIME)) {
+            if (phrase.equals(EVERY_PERIOD_OF_TIME)) {
                 return "каждый день недели";
             } else {
                 int temp = Integer.parseInt(phrase);
@@ -222,13 +221,14 @@ public enum Phrase {
         @Override
         public String getCronPhrase(String phrase) {
             if (phrase.matches(".*каждый.*")) {
-                return Cron.EVERY_PERIOD_OF_TIME;
+                return EVERY_PERIOD_OF_TIME;
             } else {
                 return Integer.toString(daysOfWeek.indexOf(phrase) + 1);
             }
         }
     };
 
+    public final static String EVERY_PERIOD_OF_TIME = "*";
     /**
      * Checking the validity of the Cron request
      */
