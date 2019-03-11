@@ -7,6 +7,8 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class CronHttpServer {
+    private static Logger LOGGER = LogManager.getLogger(CronHttpServer.class.getSimpleName());
     public static void main(String[] args) {
         try {
             HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
@@ -30,8 +33,9 @@ public class CronHttpServer {
             server.setExecutor(null);
             server.start();
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
+        LOGGER.info("Connection with the database is established");
     }
 
     private static class TranslationHandler implements HttpHandler {
@@ -51,6 +55,7 @@ public class CronHttpServer {
                  OutputStream os = exchange.getResponseBody()) {
                 json = in.readLine();
                 request = gson.fromJson(json, Request.class);
+                LOGGER.info("Message translation request received");
 
                 Response response = new TranslationResponse(request).getResponse(statement);
 
@@ -58,8 +63,9 @@ public class CronHttpServer {
                 exchange.sendResponseHeaders(200, buffer.length);
                 os.write(buffer);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e);
             }
+            LOGGER.info("The response to the translated message is sent");
         }
     }
 
@@ -80,6 +86,7 @@ public class CronHttpServer {
                  OutputStream os = exchange.getResponseBody()) {
                 json = in.readLine();
                 request = gson.fromJson(json, Request.class);
+                LOGGER.info("Request for history received");
 
                 Response response = new HistoryResponse(request).getResponse(statement);
 
@@ -87,8 +94,9 @@ public class CronHttpServer {
                 exchange.sendResponseHeaders(200, buffer.length);
                 os.write(buffer);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e);
             }
+            LOGGER.info("The response with history is sent");
         }
     }
 
@@ -99,7 +107,7 @@ public class CronHttpServer {
         }
 
         @Override
-        public void handle(HttpExchange exchange) throws IOException {
+        public void handle(HttpExchange exchange) {
             Gson gson = new GsonBuilder().create();
             String json;
             Request request;
@@ -107,6 +115,7 @@ public class CronHttpServer {
                  OutputStream os = exchange.getResponseBody()) {
                 json = in.readLine();
                 request = gson.fromJson(json, Request.class);
+                LOGGER.info("Request for update history received");
 
                 Response response = new UpdateHistoryResponse(request).getResponse(statement);
 
@@ -114,8 +123,9 @@ public class CronHttpServer {
                 exchange.sendResponseHeaders(200, buffer.length);
                 os.write(buffer);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e);
             }
+            LOGGER.info("The response with history is sent");
         }
     }
 }

@@ -2,6 +2,8 @@ package com.alexmail.cronClient;
 
 import com.alexmail.cronDTO.Request;
 import com.alexmail.cronDTO.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -9,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class SimpleRequest implements RequestManager {
+    private static Logger LOGGER = LogManager.getLogger(SimpleRequest.class.getSimpleName());
 
     /**
      * Sends a request to the Simple server
@@ -21,11 +24,13 @@ public class SimpleRequest implements RequestManager {
              ObjectInputStream is = new ObjectInputStream(socket.getInputStream())){
 
             os.writeObject(request);
+            LOGGER.info("The request is sent");
             response = (Response) is.readObject();
 
-        } catch (IOException | ClassNotFoundException e1) {
-            e1.printStackTrace();
+        } catch (IOException | ClassNotFoundException e) {
+            LOGGER.error(e);
         }
+        LOGGER.info("The response is received");
         return response;
     }
 }

@@ -4,6 +4,8 @@ import com.alexmail.cronDTO.History;
 import com.alexmail.cronDTO.Request;
 import com.alexmail.cronDTO.RequestType;
 import com.alexmail.cronDTO.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -14,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 class CronGUI extends JFrame {
+    private static Logger LOGGER = LogManager.getLogger(CronGUI.class.getSimpleName());
     private JTextArea cronArea = new JTextArea(30, 30);
     private JTextArea humanArea = new JTextArea(30, 30);
     private Integer[] num = {10, 20, 30};
@@ -129,8 +132,10 @@ class CronGUI extends JFrame {
                 request.setInputMsg(humanArea.getText());
                 request.setCronMsg(false);
             }
+            LOGGER.info("Request for translation strings completed");
 
             response = requestManager.sendRequest(request);
+            LOGGER.info("The translation of the message from the server");
 
             if (response.getErrorMsg() != null) {
                 JOptionPane.showMessageDialog(null, response.getErrorMsg(), "Warning", JOptionPane.WARNING_MESSAGE);
@@ -166,6 +171,7 @@ class CronGUI extends JFrame {
                 cronArea.setText(historyList.getSelectedValue().getOutputMsg());
                 humanArea.setText(historyList.getSelectedValue().getInputMsg());
             }
+            LOGGER.info("Received information about the selected request");
         }
     }
 
@@ -197,6 +203,7 @@ class CronGUI extends JFrame {
                 listModel.addElement(value);
             }
             historyList.addListSelectionListener(listListener);
+            LOGGER.info("History of translations from the server was received");
         }
     }
 
@@ -216,8 +223,10 @@ class CronGUI extends JFrame {
                 request.setCronMsg(false);
             }
             request.setHistoryID(historyID);
+            LOGGER.info("Request for update history completed");
 
             response = requestManager.sendRequest(request);
+            LOGGER.info("History update on the server");
 
             if (response.getErrorMsg() != null) {
                 JOptionPane.showMessageDialog(null, response.getErrorMsg(), "Warning", JOptionPane.WARNING_MESSAGE);

@@ -2,12 +2,16 @@ package com.alexmail.cronServer;
 
 import com.alexmail.cronDTO.Request;
 import com.alexmail.cronDTO.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class UpdateHistoryResponse implements ResponseManager {
+    private static Logger LOGGER = LogManager.getLogger(UpdateHistoryResponse.class.getSimpleName());
     private Request request;
+
     UpdateHistoryResponse(Request request) {
         this.request = request;
     }
@@ -22,8 +26,11 @@ public class UpdateHistoryResponse implements ResponseManager {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            LOGGER.info("History updated");
             return response;
         } else {
+
+            LOGGER.info("Input error message received");
             return response;
         }
     }

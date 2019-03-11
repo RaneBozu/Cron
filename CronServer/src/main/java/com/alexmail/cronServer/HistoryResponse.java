@@ -4,6 +4,8 @@ package com.alexmail.cronServer;
 import com.alexmail.cronDTO.History;
 import com.alexmail.cronDTO.Request;
 import com.alexmail.cronDTO.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryResponse implements ResponseManager {
+    private static Logger LOGGER = LogManager.getLogger(HistoryResponse.class.getSimpleName());
     private Request request;
 
     HistoryResponse(Request request) {
@@ -42,9 +45,10 @@ public class HistoryResponse implements ResponseManager {
                 historyList.add(history);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         response.setHistoryList(historyList);
+        LOGGER.info("The history received from the database");
         return response;
     }
 }

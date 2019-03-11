@@ -3,6 +3,8 @@ package com.alexmail.cronServer;
 import com.alexmail.cronDTO.Request;
 import com.alexmail.cronDTO.RequestType;
 import com.alexmail.cronDTO.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class RequestHandler extends Thread {
+    private static Logger LOGGER = LogManager.getLogger(RequestHandler.class.getSimpleName());
     private Socket socket;
 
     RequestHandler(Socket socket) {
@@ -29,6 +32,7 @@ public class RequestHandler extends Thread {
             Request request;
             Response response;
             request = (Request) is.readObject();
+            LOGGER.info("Request received");
             if (request.getRequestType().equals(RequestType.TRANSLATE)) {
                 response = new TranslationResponse(request).getResponse(statement);
                 os.writeObject(response);
@@ -37,7 +41,8 @@ public class RequestHandler extends Thread {
                 os.writeObject(response);
             }
         } catch (IOException | ClassNotFoundException | SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.error(ex);
         }
+        LOGGER.info("The response is sent");
     }
 }

@@ -1,17 +1,19 @@
 package com.alexmail.cronClient;
 
 import com.alexmail.cronDTO.Request;
-import com.alexmail.cronDTO.RequestType;
 import com.alexmail.cronDTO.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
 public class HttpRequest implements RequestManager {
+    private static Logger LOGGER = LogManager.getLogger(HttpRequest.class.getSimpleName());
 
     /**
      * Sends a request to the HTTP server
@@ -26,6 +28,8 @@ public class HttpRequest implements RequestManager {
         RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
         
         okhttp3.Request req = new okhttp3.Request.Builder().url(url).post(body).build();
+
+        LOGGER.info("The request is sent");
         try {
             okhttp3.Response resp = client.newCall(req).execute();
             if (resp.body() != null) {
@@ -33,8 +37,9 @@ public class HttpRequest implements RequestManager {
             }
             response = gson.fromJson(json, Response.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
+        LOGGER.info("The response is received");
         return response;
     }
 }
