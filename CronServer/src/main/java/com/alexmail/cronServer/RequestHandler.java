@@ -10,10 +10,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 public class RequestHandler extends Thread {
     private static Logger LOGGER = LogManager.getLogger(RequestHandler.class.getSimpleName());
@@ -25,22 +21,20 @@ public class RequestHandler extends Thread {
 
     public void run() {
         try (ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
-             ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
-             Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost/History", "user", "user");
-             Statement statement = conn.createStatement()) {
+             ObjectInputStream is = new ObjectInputStream(socket.getInputStream())) {
 
             Request request;
             Response response;
             request = (Request) is.readObject();
             LOGGER.info("Request received");
             if (request.getRequestType().equals(RequestType.TRANSLATE)) {
-                response = new TranslationResponse(request).getResponse(statement);
+                response = new TranslationResponse(request).getResponse();
                 os.writeObject(response);
             }else {
-                response = new HistoryResponse(request).getResponse(statement);
+                response = new HistoryResponse(request).getResponse();
                 os.writeObject(response);
             }
-        } catch (IOException | ClassNotFoundException | SQLException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             LOGGER.error(ex);
         }
         LOGGER.info("The response is sent");

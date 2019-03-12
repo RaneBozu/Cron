@@ -14,10 +14,7 @@ class Translator {
     }
 
     Response getResponse() {
-        if (request.isCronMsg()) {
-            return fromCronToHuman();
-        }
-        return fromHumanToCron();
+        return request.isCronMsg() ? fromCronToHuman() : fromHumanToCron();
     }
 
     /**

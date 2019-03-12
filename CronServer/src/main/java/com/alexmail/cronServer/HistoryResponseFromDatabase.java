@@ -8,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,15 +18,15 @@ public class HistoryResponseFromDatabase implements DataBaseRequest {
      * Received history from Database
      */
     @Override
-    public Response getResponseFromDB(Request request, Response response, Statement statement) {
+    public Response getResponseFromDB(Request request, Response response) {
         List<History> historyList = new ArrayList<>();
         ResultSet resultSet;
         int numOfRecords = request.getHistoryID();
         try {
             if(request.isReverseIsSelected()) {
-                resultSet = statement.executeQuery("SELECT * FROM history ORDER BY DATE DESC LIMIT " + numOfRecords);
+                resultSet = DataBaseConnection.query("SELECT * FROM history ORDER BY DATE DESC LIMIT " + numOfRecords);
             } else {
-                resultSet = statement.executeQuery("SELECT * FROM history ORDER BY DATE LIMIT " + numOfRecords);
+                resultSet = DataBaseConnection.query("SELECT * FROM history ORDER BY DATE LIMIT " + numOfRecords);
             }
 
             while (resultSet.next()) {

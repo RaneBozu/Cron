@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class AddHistoryToDatabase implements DataBaseRequest {
 
@@ -15,10 +14,10 @@ public class AddHistoryToDatabase implements DataBaseRequest {
      * Add History To Database
      */
     @Override
-    public Response getResponseFromDB(Request request, Response response, Statement statement) {
+    public Response getResponseFromDB(Request request, Response response) {
         if(response.getErrorMsg() == null) {
             try {
-                statement.executeUpdate("INSERT into history values (default, '" + request.getInputMsg() + "', '" + response.getOutputMsg() + "', " + request.isCronMsg() + ", default)");
+                DataBaseConnection.update("INSERT into history values (default, '" + request.getInputMsg() + "', '" + response.getOutputMsg() + "', " + request.isCronMsg() + ", default)");
             } catch (SQLException e) {
                 LOGGER.error(e);
             }

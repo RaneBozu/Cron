@@ -2,7 +2,6 @@ package com.alexmail.cronServer;
 
 import com.alexmail.cronDTO.Request;
 import com.alexmail.cronDTO.Response;
-import java.sql.Statement;
 
 public class HistoryResponse implements ResponseManager {
     private Request request;
@@ -15,9 +14,9 @@ public class HistoryResponse implements ResponseManager {
      * Generates a response to a translation request
      */
     @Override
-    public Response getResponse(Statement statement) {
+    public Response getResponse() {
         Response response = new Response();
         DataBaseRequest historyFromDB = new HistoryResponseFromDatabase();
-        return historyFromDB.getResponseFromDB(request, response, statement);
+        return historyFromDB.getResponseFromDB(request, response);
     }
 }
