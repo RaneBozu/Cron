@@ -1,7 +1,6 @@
 package com.alexmail.cronServer;
 
 import com.alexmail.cronDTO.Request;
-import com.alexmail.cronDTO.RequestType;
 import com.alexmail.cronDTO.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,26 +13,22 @@ import java.net.Socket;
 public class RequestHandler extends Thread {
     private static Logger LOGGER = LogManager.getLogger(RequestHandler.class.getSimpleName());
     private Socket socket;
+    private DataBaseConnection connection;
 
-    RequestHandler(Socket socket) {
+    RequestHandler(Socket socket, DataBaseConnection connection) {
         this.socket = socket;
+        this.connection = connection;
     }
 
     public void run() {
         try (ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream is = new ObjectInputStream(socket.getInputStream())) {
 
-            Request request;
-            Response response;
-            request = (Request) is.readObject();
+            Request request = (Request) is.readObject();
+            Response response = new ResponseManager().getResponse(request, connection);
             LOGGER.info("Request received");
-            if (request.getRequestType().equals(RequestType.TRANSLATE)) {
-                response = new TranslationResponse(request).getResponse();
-                os.writeObject(response);
-            }else {
-                response = new HistoryResponse(request).getResponse();
-                os.writeObject(response);
-            }
+
+            os.writeObject(response);
         } catch (IOException | ClassNotFoundException ex) {
             LOGGER.error(ex);
         }

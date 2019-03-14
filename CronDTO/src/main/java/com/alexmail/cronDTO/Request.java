@@ -7,8 +7,36 @@ public class Request implements Serializable {
     private RequestType requestType;
     private boolean isCronMsg;
     private String inputMsg;
+    private boolean isTimePeriodSelected;
+    private String historyStartDate;
+    private String historyEndDate;
     private boolean reverseIsSelected;
+    private int numOfHistory;
     private int historyID;
+
+    public boolean isTimePeriodSelected() {
+        return isTimePeriodSelected;
+    }
+
+    public void setTimePeriodSelected(boolean timePeriodSelected) {
+        isTimePeriodSelected = timePeriodSelected;
+    }
+
+    public String getHistoryStartDate() {
+        return historyStartDate;
+    }
+
+    public void setHistoryStartDate(String historyStartDate) {
+        this.historyStartDate = historyStartDate;
+    }
+
+    public String getHistoryEndDate() {
+        return historyEndDate;
+    }
+
+    public void setHistoryEndDate(String historyEndDate) {
+        this.historyEndDate = historyEndDate;
+    }
 
     public int getHistoryID() {
         return historyID;
@@ -16,6 +44,14 @@ public class Request implements Serializable {
 
     public void setHistoryID(int historyID) {
         this.historyID = historyID;
+    }
+
+    public int getNumOfHistory() {
+        return numOfHistory;
+    }
+
+    public void setNumOfHistory(int numOfHistory) {
+        this.numOfHistory = numOfHistory;
     }
 
     public boolean isReverseIsSelected() {

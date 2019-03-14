@@ -1,9 +1,16 @@
 package com.alexmail.cronServer;
 
+import com.alexmail.cronDTO.History;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class DataBaseConnection {
-    private static DataBaseConnection ourInstance;
+    private static Logger LOGGER = LogManager.getLogger(CronHttpServer.class.getSimpleName());
+    private static DataBaseConnection connection;
     private static Statement statement;
 
     private DataBaseConnection() {
@@ -11,25 +18,36 @@ class DataBaseConnection {
             Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost/History", "user", "user");
             statement = conn.createStatement();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
+        LOGGER.info("Connection with the database is established");
     }
 
-    static void connect() {
-        if(ourInstance == null){
+    static DataBaseConnection getConnection() {
+        if(connection == null){
             synchronized (DataBaseConnection.class){
-                if(ourInstance == null) {
-                    ourInstance = new DataBaseConnection();
+                if(connection == null) {
+                    connection = new DataBaseConnection();
                 }
             }
         }
+        return connection;
     }
 
-    static ResultSet query(String sql) throws SQLException {
-        return statement.executeQuery(sql);
+    List<History> query(String sql) throws SQLException {
+        ResultSet resultSet = statement.executeQuery(sql);
+        List<History> historyList = new ArrayList<>();
+        while (resultSet.next()) {
+            History history = new History(Integer.parseInt(resultSet.getString(1)),
+                    resultSet.getString(2),
+                    resultSet.getString(3),
+                    resultSet.getBoolean(4));
+            historyList.add(history);
+        }
+        return historyList;
     }
 
-    static void update(String sql) throws SQLException {
+    void update(String sql) throws SQLException {
         statement.executeUpdate(sql);
     }
 }

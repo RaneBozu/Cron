@@ -1,7 +1,7 @@
 package com.alexmail.cronDTO;
 
 public enum RequestType {
-    TRANSLATE{
+    TRANSLATE {
         @Override
         public String getType() {
             return "translate";

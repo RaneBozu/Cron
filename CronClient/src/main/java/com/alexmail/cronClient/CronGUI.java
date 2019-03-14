@@ -10,9 +10,11 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.util.List;
 
 class CronGUI extends JFrame {
@@ -21,10 +23,13 @@ class CronGUI extends JFrame {
     private JTextArea humanArea = new JTextArea(30, 30);
     private Integer[] num = {10, 20, 30};
     private JComboBox<Integer> numOfHistory = new JComboBox<>(num);
+    private JFormattedTextField startDate;
+    private JFormattedTextField endDate;
+    private JCheckBox timePeriod;
     private JCheckBox reverse;
     private DefaultListModel<History> listModel = new DefaultListModel<>();
     private JList<History> historyList = new JList<>(listModel);
-    private RequestManager requestManager;
+    private RequestManager requestManager = new HttpRequest();
     private int historyID;
     private Response response;
     private Request request;
@@ -39,7 +44,17 @@ class CronGUI extends JFrame {
         JButton updateButton = new JButton("Update");
         JPanel leftPanel = new JPanel();
         JPanel rightPanel = new JPanel();
+        timePeriod = new JCheckBox("Установите промежуток времени:  ");
         reverse = new JCheckBox("История в обратном порядке");
+        MaskFormatter mf = null;
+        try {
+            mf = new MaskFormatter("##.##.####  ##:##:##");
+            mf.setPlaceholderCharacter('_');
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        startDate = new JFormattedTextField(mf);
+        endDate = new JFormattedTextField(mf);
 
         JScrollPane scrollPane = new JScrollPane(historyList);
         JLabel infoLabel = new JLabel("Введите запрос: от 1 до 6 параметров.(минуты, часы, день месяца, месяц, день недели, сезон)");
@@ -53,22 +68,19 @@ class CronGUI extends JFrame {
         leftPanel.setLayout(new GridBagLayout());
         GridBagConstraints midPanelConstraints = new GridBagConstraints();
         midPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+
         midPanelConstraints.gridx = 1;
         midPanelConstraints.gridy = 0;
         leftPanel.add(translateButton, midPanelConstraints);
 
-        midPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
         midPanelConstraints.gridheight = 2;
         midPanelConstraints.gridx = 0;
         leftPanel.add(cronArea, midPanelConstraints);
 
-
-        midPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
         midPanelConstraints.gridheight = 2;
         midPanelConstraints.gridx = 2;
         leftPanel.add(humanArea, midPanelConstraints);
 
-        midPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
         midPanelConstraints.gridx = 1;
         midPanelConstraints.gridy = 1;
         leftPanel.add(updateButton, midPanelConstraints);
@@ -80,21 +92,30 @@ class CronGUI extends JFrame {
         rightPanelConstraints.gridx = 0;
         rightPanel.add(reverse, rightPanelConstraints);
 
-        rightPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
         rightPanelConstraints.weighty = 0.1;
         rightPanelConstraints.gridx = 0;
         rightPanelConstraints.gridy = 1;
         rightPanel.add(numOfHistoryLabel, rightPanelConstraints);
 
-        rightPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        rightPanelConstraints.gridx = 2;
+        rightPanelConstraints.gridx = 1;
         rightPanel.add(numOfHistory, rightPanelConstraints);
 
-        rightPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        rightPanelConstraints.weighty = 0.1;
-        rightPanelConstraints.gridwidth = 3;
         rightPanelConstraints.gridx = 0;
         rightPanelConstraints.gridy = 2;
+        rightPanel.add(timePeriod, rightPanelConstraints);
+
+        rightPanelConstraints.gridx = 1;
+        rightPanelConstraints.gridy = 2;
+        rightPanel.add(startDate, rightPanelConstraints);
+
+        rightPanelConstraints.gridx = 2;
+        rightPanelConstraints.gridy = 2;
+        rightPanel.add(endDate, rightPanelConstraints);
+
+        rightPanelConstraints.weighty = 0.1;
+        rightPanelConstraints.gridwidth = 4;
+        rightPanelConstraints.gridx = 0;
+        rightPanelConstraints.gridy = 3;
         rightPanel.add(scrollPane, rightPanelConstraints);
 
         scrollPane.setPreferredSize(new Dimension(600, 400));
@@ -108,7 +129,7 @@ class CronGUI extends JFrame {
 
         ListListener listListener = new ListListener();
         historyList.addListSelectionListener(listListener);
-        Timer timer = new Timer(5000, new TimerListener(listListener));
+        Timer timer = new Timer(10000, new TimerListener(listListener));
         timer.start();
     }
 
@@ -120,7 +141,6 @@ class CronGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            requestManager = new HttpRequest();
             request = new Request(RequestType.TRANSLATE);
             if (!cronArea.getText().isEmpty() && !humanArea.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Возможен ввод только в одно поле", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -132,7 +152,6 @@ class CronGUI extends JFrame {
                 request.setInputMsg(humanArea.getText());
                 request.setCronMsg(false);
             }
-            LOGGER.info("Request for translation strings completed");
 
             response = requestManager.sendRequest(request);
             LOGGER.info("The translation of the message from the server");
@@ -175,42 +194,9 @@ class CronGUI extends JFrame {
         }
     }
 
-    private class TimerListener implements ActionListener {
-
-        ListListener listListener;
-
-        TimerListener(ListListener listListener) {
-            this.listListener = listListener;
-        }
-
-        /**
-         * Sends a request to show history
-         */
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
-            historyList.removeListSelectionListener(listListener);
-            requestManager = new HttpRequest();
-            request = new Request(RequestType.HISTORY);
-            request.setReverseIsSelected(reverse.isSelected());
-            request.setHistoryID((int) numOfHistory.getSelectedItem());
-
-            response = requestManager.sendRequest(request);
-
-            listModel.clear();
-            List<History> history = response.getHistoryList();
-            for (History value : history) {
-                listModel.addElement(value);
-            }
-            historyList.addListSelectionListener(listListener);
-            LOGGER.info("History of translations from the server was received");
-        }
-    }
-
     private class UpdateButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            requestManager = new HttpRequest();
             request = new Request(RequestType.UPDATE_HISTORY);
             if (historyID == 0 || cronArea.isEditable() && humanArea.isEditable()) {
                 JOptionPane.showMessageDialog(null, "Выберите запись для изменения", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -237,6 +223,40 @@ class CronGUI extends JFrame {
                 cronArea.setText(response.getOutputMsg());
                 cronArea.setEditable(true);
             }
+        }
+    }
+
+    private class TimerListener implements ActionListener {
+
+        ListListener listListener;
+
+        TimerListener(ListListener listListener) {
+            this.listListener = listListener;
+        }
+
+        /**
+         * Sends a request to show history
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            historyList.removeListSelectionListener(listListener);
+            request = new Request(RequestType.HISTORY);
+            request.setReverseIsSelected(reverse.isSelected());
+            request.setNumOfHistory((int) numOfHistory.getSelectedItem());
+            request.setTimePeriodSelected(timePeriod.isSelected());
+            request.setHistoryStartDate(startDate.getText());
+            request.setHistoryEndDate(endDate.getText());
+
+            response = requestManager.sendRequest(request);
+
+            listModel.clear();
+            List<History> history = response.getHistoryList();
+            for (History value : history) {
+                listModel.addElement(value);
+            }
+            historyList.addListSelectionListener(listListener);
+            LOGGER.info("History of translations from the server was received");
         }
     }
 }

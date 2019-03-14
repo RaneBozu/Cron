@@ -2,23 +2,31 @@ package com.alexmail.cronServer;
 
 import com.alexmail.cronDTO.Request;
 import com.alexmail.cronDTO.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-class TranslationResponse implements ResponseManager {
-    private Request request;
+import java.sql.SQLException;
 
-    TranslationResponse(Request request) {
-        this.request = request;
-    }
+class TranslationResponse {
+    private static Logger LOGGER = LogManager.getLogger(TranslationResponse.class.getSimpleName());
 
     /**
      * Generates a response to a history request
      */
-    @Override
-    public Response getResponse() {
+    Response getResponse(Request request, DataBaseConnection connection) {
         Translator translator = new Translator(request);
         Response response = translator.getResponse();
-        DataBaseRequest addHistory = new AddHistoryToDatabase();
-        addHistory.getResponseFromDB(request, response);
+        if (response.getErrorMsg() == null) {
+            try {
+                String sql = "INSERT into history values (default, '" + request.getInputMsg() + "', '" + response.getOutputMsg() + "', " + request.isCronMsg() + ", default)";
+                connection.update(sql);
+            } catch (SQLException e) {
+                LOGGER.error(e);
+            }
+            LOGGER.info("Message translated");
+        } else {
+            LOGGER.info("Input error message received");
+        }
         return response;
     }
 }

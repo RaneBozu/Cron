@@ -11,9 +11,10 @@ public class CronServer {
     public static void main(String[] args) {
 
         try (ServerSocket serverSocket = new ServerSocket(8050)) {
-            DataBaseConnection.connect();
+
+            DataBaseConnection connection = DataBaseConnection.getConnection();
             while (true) {
-                new RequestHandler(serverSocket.accept()).start();
+                new RequestHandler(serverSocket.accept(), connection).start();
             }
         } catch (IOException e) {
             LOGGER.error(e);
