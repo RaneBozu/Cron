@@ -227,7 +227,7 @@ public enum Phrase {
         }
     };
 
-    public final static String EVERY_PERIOD_OF_TIME = "*";
+    private final static String EVERY_PERIOD_OF_TIME = "*";
     /**
      * Checking the validity of the Cron request
      */

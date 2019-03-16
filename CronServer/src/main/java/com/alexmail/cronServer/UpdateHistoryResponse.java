@@ -14,8 +14,7 @@ class UpdateHistoryResponse {
      * Generates a response to update history
      */
     Response getResponse(Request request, DataBaseConnection connection) {
-        Translator translator = new Translator(request);
-        Response response = translator.getResponse();
+        Response response = new Translator(request).getResponse();
         if (response.getErrorMsg() == null) {
             try {
                 String sql = "UPDATE history SET \"OutputMsg\" = '" + response.getOutputMsg() + "', \"InputMsg\" = '" + request.getInputMsg() + "' WHERE id = " + request.getHistoryID();

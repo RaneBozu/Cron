@@ -5,12 +5,12 @@ import java.io.Serializable;
 public class Request implements Serializable {
 
     private RequestType requestType;
-    private boolean isCronMsg;
     private String inputMsg;
+    private boolean isCronMsg;
+    private boolean reverseIsSelected;
     private boolean isTimePeriodSelected;
     private String historyStartDate;
     private String historyEndDate;
-    private boolean reverseIsSelected;
     private int numOfHistory;
     private int historyID;
 

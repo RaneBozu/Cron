@@ -17,7 +17,6 @@ class HistoryResponse {
      * Generates a response to a translation request
      */
     Response getResponse(Request request, DataBaseConnection connection) {
-        Response response = new Response();
         List<History> historyList = new ArrayList<>();
         String sql;
         String datePeriod = "";
@@ -33,6 +32,7 @@ class HistoryResponse {
         } catch (SQLException e) {
             LOGGER.error(e);
         }
+        Response response = new Response();
         response.setHistoryList(historyList);
         LOGGER.info("The history received from the database");
         return response;

@@ -14,19 +14,18 @@ class TranslationResponse {
      * Generates a response to a history request
      */
     Response getResponse(Request request, DataBaseConnection connection) {
-        Translator translator = new Translator(request);
-        Response response = translator.getResponse();
+        Response response = new Translator(request).getResponse();
         if (response.getErrorMsg() == null) {
+            String sqlQuery = "INSERT into history values (default, '" + request.getInputMsg() + "', '" + response.getOutputMsg() + "', " + request.isCronMsg() + ", default)";
             try {
-                String sql = "INSERT into history values (default, '" + request.getInputMsg() + "', '" + response.getOutputMsg() + "', " + request.isCronMsg() + ", default)";
-                connection.update(sql);
+                connection.update(sqlQuery);
             } catch (SQLException e) {
                 LOGGER.error(e);
             }
-            LOGGER.info("Message translated");
         } else {
             LOGGER.info("Input error message received");
         }
+        LOGGER.info("Message translated");
         return response;
     }
 }
