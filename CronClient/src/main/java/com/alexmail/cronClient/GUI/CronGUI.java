@@ -1,14 +1,14 @@
-package com.alexmail.cronClient;
+package com.alexmail.cronClient.GUI;
 
-import com.alexmail.cronClient.Listeners.*;
+import com.alexmail.cronClient.GUI.Listeners.*;
 import com.alexmail.cronDTO.History;
 
 import javax.swing.*;
 import java.awt.*;
 
-class CronGUI extends JFrame {
+public class CronGUI extends JFrame {
 
-    CronGUI() throws HeadlessException {
+    public CronGUI() throws HeadlessException {
         super("Corn");
 
         this.setBounds(200, 200, 1400, 550);

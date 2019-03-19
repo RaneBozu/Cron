@@ -1,6 +1,9 @@
 package com.alexmail.cronClient;
 
 
+
+import com.alexmail.cronClient.GUI.CronGUI;
+
 import javax.swing.*;
 
 public class Cron {

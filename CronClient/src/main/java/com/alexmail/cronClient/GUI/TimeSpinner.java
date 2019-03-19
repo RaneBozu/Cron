@@ -1,4 +1,4 @@
-package com.alexmail.cronClient;
+package com.alexmail.cronClient.GUI;
 
 import javax.swing.*;
 import java.util.Calendar;

@@ -14,6 +14,10 @@ public class Request implements Serializable {
     private int numOfHistory;
     private int historyID;
 
+    public Request(RequestType requestType) {
+        this.requestType = requestType;
+    }
+
     public boolean isTimePeriodSelected() {
         return isTimePeriodSelected;
     }
@@ -60,10 +64,6 @@ public class Request implements Serializable {
 
     public void setReverseIsSelected(boolean reverseIsSelected) {
         this.reverseIsSelected = reverseIsSelected;
-    }
-
-    public Request(RequestType requestType) {
-        this.requestType = requestType;
     }
 
     public RequestType getRequestType() {

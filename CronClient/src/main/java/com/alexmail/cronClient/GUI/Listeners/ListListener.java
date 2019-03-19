@@ -1,4 +1,4 @@
-package com.alexmail.cronClient.Listeners;
+package com.alexmail.cronClient.GUI.Listeners;
 
 import com.alexmail.cronDTO.History;
 import org.apache.logging.log4j.LogManager;
